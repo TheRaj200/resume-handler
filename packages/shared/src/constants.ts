@@ -76,6 +76,10 @@ export const DEFAULT_PROFILE_ID = "primary";
 export const STORAGE_KEYS = {
   settings: "jobpilot.settings",
   autofillPreferences: "jobpilot.autofill.preferences",
+  syncSettings: "jobpilot.sync.settings",
+  syncRefreshToken: "jobpilot.sync.refreshToken",
+  syncAccessToken: "jobpilot.sync.accessToken",
+  syncUser: "jobpilot.sync.user",
   encryptedApiKey: "jobpilot.apiKey.encrypted",
   keySalt: "jobpilot.apiKey.salt",
   vaultSession: "jobpilot.apiKey.vaultSession",

@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
 import {
   AI_PROVIDERS,
   AI_PROVIDER_LABELS,
@@ -18,7 +19,15 @@ import {
   saveAutofillPreferences,
   type AutofillPreferences,
 } from "../../lib/autofill-preferences";
-import { deleteAllLocalData, exportAllLocalData } from "../../db";
+import { db, deleteAllLocalData, exportAllLocalData, resolveSyncConflict } from "../../db";
+import {
+  getSyncSettings,
+  loginOrRegister,
+  logoutSync,
+  saveSyncSettings,
+  syncNow,
+  type SyncSettings,
+} from "../../lib/sync-client";
 import {
   deleteStoredApiKey,
   getUnlockedApiKey,
@@ -53,6 +62,14 @@ export function SettingsPanel() {
   );
   const [preferencesStatus, setPreferencesStatus] = useState<"idle" | "saved">("idle");
   const [dataBusy, setDataBusy] = useState(false);
+  const [syncSettings, setSyncSettings] = useState<SyncSettings>({ enabled: false, baseUrl: "http://localhost:4000" });
+  const [syncEmail, setSyncEmail] = useState("");
+  const [syncPassword, setSyncPassword] = useState("");
+  const [syncMode, setSyncMode] = useState<"login" | "register">("login");
+  const [syncUser, setSyncUser] = useState<string | null>(null);
+  const [syncBusy, setSyncBusy] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
+  const conflicts = useLiveQuery(() => db.conflicts.toArray(), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -64,6 +81,12 @@ export function SettingsPanel() {
       if (parsed.success) setSettings(parsed.data);
       const preferences = await getAutofillPreferences();
       if (!cancelled) setAutofillPreferences(preferences);
+      const savedSync = await getSyncSettings();
+      if (!cancelled) setSyncSettings(savedSync);
+      const syncIdentity = await chrome.storage.local.get(STORAGE_KEYS.syncUser);
+      if (!cancelled && typeof syncIdentity[STORAGE_KEYS.syncUser] === "string") {
+        setSyncUser(String(syncIdentity[STORAGE_KEYS.syncUser]));
+      }
       const storedKey = await hasStoredApiKey();
       if (!cancelled) setVaultState(getUnlockedApiKey() ? "unlocked" : storedKey ? "locked" : "empty");
     })();
@@ -191,6 +214,48 @@ export function SettingsPanel() {
       setError(cause instanceof Error ? cause.message : "Could not delete local data");
     } finally {
       setDataBusy(false);
+    }
+  }
+
+  async function handleSyncAuth() {
+    setSyncBusy(true);
+    setSyncMessage(null);
+    try {
+      const session = await loginOrRegister(syncMode, syncEmail, syncPassword);
+      setSyncUser(session.user.email);
+      await saveSyncSettings({ ...syncSettings, enabled: true });
+      setSyncMessage("Cloud login successful.");
+    } catch (cause) {
+      setSyncMessage(cause instanceof Error ? cause.message : "Cloud login failed");
+    } finally {
+      setSyncBusy(false);
+    }
+  }
+
+  async function handleSyncNow() {
+    setSyncBusy(true);
+    setSyncMessage(null);
+    try {
+      await saveSyncSettings(syncSettings);
+      const result = await syncNow();
+      setSyncMessage(`Sync complete — pushed ${result.pushed}, pulled ${result.pulled}, conflicts ${result.conflicts}.`);
+    } catch (cause) {
+      setSyncMessage(cause instanceof Error ? cause.message : "Sync failed");
+    } finally {
+      setSyncBusy(false);
+    }
+  }
+
+  async function handleSyncLogout() {
+    setSyncBusy(true);
+    try {
+      await logoutSync();
+      setSyncUser(null);
+      setSyncMessage("Cloud sync logged out. Local data remains safe.");
+    } catch (cause) {
+      setSyncMessage(cause instanceof Error ? cause.message : "Logout failed");
+    } finally {
+      setSyncBusy(false);
     }
   }
 
@@ -572,6 +637,75 @@ export function SettingsPanel() {
             Delete all local data
           </Button>
         </div>
+      </Card>
+
+      <Card className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-slate-100">Optional cloud sync</h3>
+            <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
+              Default OFF. Local data primary rahega; sync enable karne par applications backend ke saath sync honge.
+            </p>
+          </div>
+          <input
+            type="checkbox"
+            className="accent-indigo-500"
+            checked={syncSettings.enabled}
+            onChange={(event) => setSyncSettings((previous) => ({ ...previous, enabled: event.target.checked }))}
+          />
+        </div>
+        <Field label="Backend URL">
+          <input
+            className={inputClass}
+            value={syncSettings.baseUrl}
+            onChange={(event) => setSyncSettings((previous) => ({ ...previous, baseUrl: event.target.value }))}
+            placeholder="http://localhost:4000"
+          />
+        </Field>
+        {!syncUser ? (
+          <>
+            <div className="grid grid-cols-2 gap-2">
+              <Field label="Email">
+                <input className={inputClass} type="email" value={syncEmail} onChange={(event) => setSyncEmail(event.target.value)} placeholder="you@example.com" />
+              </Field>
+              <Field label="Password">
+                <input className={inputClass} type="password" value={syncPassword} onChange={(event) => setSyncPassword(event.target.value)} placeholder="8+ characters" />
+              </Field>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" onClick={() => void handleSyncAuth()} disabled={syncBusy || !syncEmail || syncPassword.length < 8}>
+                {syncBusy ? "Please wait..." : syncMode === "login" ? "Login & enable" : "Register & enable"}
+              </Button>
+              <Button type="button" variant="ghost" onClick={() => setSyncMode((mode) => mode === "login" ? "register" : "login")}>
+                Switch to {syncMode === "login" ? "register" : "login"}
+              </Button>
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-[11px] text-emerald-200">
+            <span>Connected as {syncUser}</span>
+            <div className="flex gap-2">
+              <Button type="button" variant="secondary" onClick={() => void handleSyncNow()} disabled={syncBusy || !syncSettings.enabled}>Sync now</Button>
+              <Button type="button" variant="ghost" onClick={() => void handleSyncLogout()} disabled={syncBusy}>Logout</Button>
+            </div>
+          </div>
+        )}
+        <Button type="button" variant="secondary" onClick={() => void saveSyncSettings(syncSettings)}>Save sync settings</Button>
+        {syncMessage ? <p className="rounded-xl border border-indigo-400/20 bg-indigo-500/10 px-3 py-2 text-[11px] text-indigo-200">{syncMessage}</p> : null}
+        {conflicts && conflicts.length > 0 ? (
+          <div className="space-y-2 rounded-xl border border-amber-400/20 bg-amber-500/10 p-3">
+            <p className="text-xs font-semibold text-amber-200">Sync conflicts ({conflicts.length})</p>
+            {conflicts.map((conflict) => (
+              <div key={conflict.id} className="flex items-center justify-between gap-2 text-[11px] text-slate-300">
+                <span>{conflict.entity} · {conflict.entityId.slice(0, 8)}…</span>
+                <div className="flex gap-1">
+                  <Button type="button" variant="ghost" className="px-2 py-1 text-[10px]" onClick={() => void resolveSyncConflict(conflict.id, "local")}>Keep local</Button>
+                  <Button type="button" variant="secondary" className="px-2 py-1 text-[10px]" onClick={() => void resolveSyncConflict(conflict.id, "remote")}>Keep cloud</Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : null}
       </Card>
 
       {error ? (

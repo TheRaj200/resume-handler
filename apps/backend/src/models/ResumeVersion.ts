@@ -15,6 +15,7 @@ const resumeVersionSchema = new Schema(
       enum: ["ats-classic", "modern"],
       required: true,
     },
+    version: { type: Number, default: 1 },
   },
   { timestamps: true, versionKey: false },
 );

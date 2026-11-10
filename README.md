@@ -41,8 +41,9 @@ Last verified on 2026-11-10 — `npm run typecheck`, `npm run test` (autofill, r
   - Express 5 + Mongoose models (`Application`, `Profile`, `ResumeVersion`, `User`).
   - REST endpoints at `/api/v1/applications` (CRUD, status updates, CSV export) + `/api/v1/health`.
   - **Auth/JWT:** email/password registration, bcrypt password hashing, 15-minute access tokens, rotating 30-day refresh tokens, logout/revocation, and protected application routes.
-  - **Sync API:** authenticated `/api/v1/sync/push` and `/api/v1/sync/pull` for application records, with optimistic version conflict responses and delete tombstones.
-  - Not yet present: extension login/sync client, profile/resume sync routes, conflict resolution UI, GridFS backup.
+  - **Sync API:** authenticated `/api/v1/sync/push` and `/api/v1/sync/pull` for application, profile, and resume-version records, with optimistic version conflict responses and delete tombstones.
+  - Extension sync client supports optional Settings login/register, manual/app-open/5-minute sync, IndexedDB queueing, and Keep local / Keep cloud conflict actions.
+  - Not yet present: GridFS backup for actual PDF/DOC files.
 - **Automated Verification:**
   - Unit tests: `npm run test` (autofill, resume-studio, tracker).
   - Playwright E2E smoke tests: `npm run smoke` (extension persistence, scan/fill/undo, studio PDF generation, tracker lifecycle & export).
@@ -52,8 +53,8 @@ Last verified on 2026-11-10 — `npm run typecheck`, `npm run test` (autofill, r
 - **Tailor modes (FR-RES-07):** Full and Quick tailor are implemented. Manual mode remains a future polish item.
 - **Resume ↔ application link (FR-RES-16 / FR-TRK-07):** implemented from the application detail view; link/change a generated version and show the linked role/version.
 - **XLSX export (FR-TRK-10):** implemented alongside CSV; includes linked resume version and target role when available.
-- **Settings completeness (FR-SET-05…10):** connection test, autofill preferences, export-all/delete-all and privacy explainer are implemented. Cloud sync controls remain pending.
-- **Cloud (D-02):** auth and the application sync API are implemented, but the extension sync client, conflict UI and file backup are still pending. The extension still works entirely offline against IndexedDB.
+- **Settings completeness (FR-SET-05…10):** connection test, autofill preferences, export-all/delete-all, privacy explainer and optional cloud sync controls are implemented.
+- **Cloud (D-02):** auth, profile/application/resume-version sync, token refresh, conflict choices and periodic sync are implemented. Actual PDF/DOC backup through GridFS remains pending. The extension remains fully usable offline.
 - **Follow-up reminders (FR-TRK-13)** and **portal adapters** (Greenhouse / Lever / LinkedIn / Naukri / Indeed) are still pending.
 - PDF uses standard Helvetica (WinAnsi), so non-Latin scripts (e.g. Devanagari) are stripped.
 

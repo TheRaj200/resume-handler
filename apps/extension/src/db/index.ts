@@ -51,6 +51,8 @@ export interface SyncQueueItem {
   entityId: string;
   op: "upsert" | "delete";
   updatedAt: string;
+  baseVersion?: number;
+  record?: unknown;
 }
 
 export interface ConflictRecord {
@@ -119,6 +121,53 @@ function now(): string {
   return new Date().toISOString();
 }
 
+export async function enqueueSync(
+  entity: string,
+  entityId: string,
+  op: "upsert" | "delete",
+  record?: unknown,
+  baseVersion?: number,
+): Promise<void> {
+  const item: SyncQueueItem = {
+    id: `${entity}:${entityId}`,
+    entity,
+    entityId,
+    op,
+    updatedAt: now(),
+    baseVersion,
+    record,
+  };
+  await db.syncQueue.put(item);
+}
+
+export async function resolveSyncConflict(
+  conflictId: string,
+  choice: "local" | "remote",
+): Promise<void> {
+  const conflict = await db.conflicts.get(conflictId);
+  if (!conflict) return;
+  const selected = (choice === "local" ? conflict.local : conflict.remote) as Record<string, unknown>;
+  const id = String(selected.id ?? selected._id ?? conflict.entityId);
+  if (conflict.entity === "application") {
+    await db.applications.put({
+      ...selected,
+      id,
+      userId: LOCAL_USER_ID,
+      syncStatus: choice === "local" ? "pending" : "synced",
+    } as Application);
+    if (choice === "local") {
+      await enqueueSync("application", id, "upsert", selected);
+    }
+  } else if (conflict.entity === "profile") {
+    await db.profile.put({ ...selected, id, userId: LOCAL_USER_ID, syncStatus: choice === "local" ? "pending" : "synced" } as Profile);
+    if (choice === "local") await enqueueSync("profile", id, "upsert", selected);
+  } else if (conflict.entity === "resumeVersion") {
+    await db.resumeVersions.put({ ...selected, id, userId: LOCAL_USER_ID, syncStatus: choice === "local" ? "pending" : "synced" } as ResumeVersion);
+    if (choice === "local") await enqueueSync("resumeVersion", id, "upsert", selected);
+  }
+  await db.conflicts.delete(conflictId);
+}
+
 export async function getProfile(): Promise<Profile | undefined> {
   return db.profile.get(DEFAULT_PROFILE_ID);
 }
@@ -139,6 +188,7 @@ export async function saveProfile(input: ProfileInput): Promise<Profile> {
   };
 
   await db.profile.put(record);
+  await enqueueSync("profile", record.id, "upsert", record, existing?.version);
   return record;
 }
 
@@ -850,6 +900,7 @@ export async function saveResumeVersion(
   };
 
   await db.resumeVersions.put(record);
+  await enqueueSync("resumeVersion", record.id, "upsert", record, undefined);
   return record;
 }
 
@@ -1015,6 +1066,7 @@ export async function saveApplication(
   };
 
   await db.applications.put(record);
+  await enqueueSync("application", record.id, "upsert", record, existing?.version);
   return record;
 }
 
@@ -1048,6 +1100,7 @@ export async function updateApplicationStatus(
   };
 
   await db.applications.put(updated);
+  await enqueueSync("application", updated.id, "upsert", updated, app.version);
   return updated;
 }
 
@@ -1061,6 +1114,7 @@ export async function deleteApplication(id: string, soft = true): Promise<void> 
       version: app.version + 1,
       syncStatus: "pending",
     });
+    await enqueueSync("application", id, "delete", undefined, app.version);
   } else {
     await db.applications.delete(id);
   }

@@ -16,6 +16,7 @@ import { ResumeLibrary } from "../features/resumes/ResumeLibrary";
 import { ResumeStudio } from "../features/resume-studio/ResumeStudio";
 import { ApplicationsManager } from "../features/applications/ApplicationsManager";
 import { SettingsPanel } from "../features/settings/SettingsPanel";
+import { getSyncSettings, syncNow } from "../lib/sync-client";
 
 const TABS = [
   { id: "dashboard", label: "Dashboard" },
@@ -223,6 +224,18 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
 
 export function SidePanel() {
   const [active, setActive] = useState<TabId>("dashboard");
+
+  useEffect(() => {
+    void (async () => {
+      const settings = await getSyncSettings();
+      if (!settings.enabled) return;
+      try {
+        await syncNow();
+      } catch (error) {
+        console.warn("[sync] background sync skipped:", error);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
