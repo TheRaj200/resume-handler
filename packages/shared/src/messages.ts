@@ -1,4 +1,4 @@
-import type { FillPlan, FillResult, FormScanResult, PageContext } from "./types";
+import type { DetectedField, FillPlan, FillResult, FormScanResult, PageContext } from "./types";
 
 export type ExtensionMessage =
   | { type: "PING" }
@@ -9,7 +9,7 @@ export type ExtensionMessage =
   | { type: "RESCAN_FORM" }
   | { type: "EXTRACT_JD" }
   | { type: "HIGHLIGHT_FIELDS"; elementIds: string[] }
-  | { type: "FORM_CHANGED"; data: { fieldCount: number } };
+  | { type: "FORM_CHANGED"; data: { fieldCount: number; fields?: DetectedField[] } };
 
 export interface MessageError {
   code: string;

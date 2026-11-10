@@ -8,7 +8,7 @@ import {
 } from "@jobpilot/shared";
 import { countApplications, countResumes, db, getProfile } from "../db";
 import { getActiveTab, getPageContext, isInjectableUrl } from "../lib/content-script";
-import { Badge, Card, EmptyState, type BadgeTone } from "../components/ui";
+import { Badge, Button, Card, EmptyState, type BadgeTone } from "../components/ui";
 import { AutofillWorkflow } from "../features/autofill/AutofillWorkflow";
 import { ProfileEditor } from "../features/profile/ProfileEditor";
 import { useProfileCompleteness } from "../features/profile/useProfileCompleteness";
@@ -130,6 +130,12 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
             <Badge>No JD</Badge>
           )}
         </div>
+
+        {context?.hasJobPosting ? (
+          <Button className="mt-3 w-full" onClick={() => onNavigate("studio")}>
+            Build resume for this job
+          </Button>
+        ) : null}
 
       </Card>
 

@@ -21,8 +21,11 @@ import {
   db,
   findDuplicateApplication,
   getFieldMappings,
+  getFormMemoryKey,
+  getRememberedFormAnswers,
   getProfile,
   getResumeBlob,
+  rememberFormAnswers,
   saveCustomField,
   saveCustomFieldValue,
   saveApplication,
@@ -143,7 +146,16 @@ export function AutofillWorkflow() {
 
   useEffect(() => {
     function handleMessage(message: ExtensionMessage) {
-      if (message.type === "FORM_CHANGED") setFormChanged(true);
+      if (message.type === "FORM_CHANGED") {
+        setFormChanged(true);
+        if (message.data.fields?.length) {
+          void getActiveTab().then((tab) => {
+            if (!tab?.url) return;
+            const hostname = new URL(tab.url).hostname;
+            return rememberFormAnswers(hostname, tab.url!, message.data.fields ?? []);
+          });
+        }
+      }
     }
 
     chrome.runtime.onMessage.addListener(handleMessage);
@@ -169,6 +181,10 @@ export function AutofillWorkflow() {
 
       const result = await scanForm(tab.id);
       if (!result) throw new Error("Could not scan this page.");
+      const targetDomain = new URL(tab.url).hostname;
+      await rememberFormAnswers(targetDomain, tab.url, result.fields);
+      const rememberedAnswers = await getRememberedFormAnswers(targetDomain);
+      const rememberedByKey = new Map(rememberedAnswers.map((answer) => [answer.key, answer]));
 
       const context = await getPageContext(tab.id);
       setPageContext(context);
@@ -196,8 +212,7 @@ export function AutofillWorkflow() {
         defaultResumeTitle: defaultResume?.title,
       });
 
-      const targetDomain = new URL(tab.url).hostname;
-      const mappings = await getFieldMappings(targetDomain);
+       const mappings = await getFieldMappings(targetDomain);
       const matchResult = matchFields(result.fields, profileFacts, mappings, customFields, {
         autoThreshold: autofillPreferences.autoThreshold,
         reviewThreshold: autofillPreferences.reviewThreshold,
@@ -218,17 +233,21 @@ export function AutofillWorkflow() {
           !(match.profileKey === "resume.file" && !attachResume),
       }));
 
-      const unmatchedRows: PlanRow[] = matchResult.unmatched.map((entry) => ({
-        id: entry.field.elementId,
-        field: entry.field,
-        profileKey: "",
-        value: null,
-        confidence: 0,
-        requiresReview: true,
-        sensitive: false,
-        selected: false,
-        reason: entry.reason,
-      }));
+       const unmatchedRows: PlanRow[] = matchResult.unmatched.map((entry) => {
+         const remembered = rememberedByKey.get(getFormMemoryKey(entry.field));
+         return {
+           id: entry.field.elementId,
+           field: entry.field,
+           profileKey: remembered ? `memory.${remembered.key}` : "",
+           value: remembered?.value ?? null,
+           confidence: remembered ? 0.88 : 0,
+           requiresReview: Boolean(remembered),
+           sensitive: false,
+           selected: Boolean(remembered),
+           source: remembered ? "stored" : undefined,
+           reason: remembered ? "Remembered answer — review before filling." : entry.reason,
+         };
+       });
 
       setRows([...matchedRows, ...unmatchedRows]);
       setBlocked(matchResult.blocked);

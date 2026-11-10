@@ -13,6 +13,7 @@ import {
   type CustomFieldInput,
   type CustomFieldValue,
   type CustomFieldValueData,
+  type DetectedField,
   type Education,
   type EducationInput,
   type Experience,
@@ -64,6 +65,22 @@ export interface ConflictRecord {
   createdAt: string;
 }
 
+export interface FormMemoryField {
+  key: string;
+  label: string;
+  inputType: string;
+  value: string;
+  url: string;
+  updatedAt: string;
+}
+
+export interface FormMemoryRecord {
+  id: string;
+  domain: string;
+  fields: FormMemoryField[];
+  updatedAt: string;
+}
+
 export interface SettingRecord {
   key: string;
   value: unknown;
@@ -90,6 +107,7 @@ export class JobPilotDB extends Dexie {
   settings!: Table<SettingRecord, string>;
   syncQueue!: Table<SyncQueueItem, string>;
   conflicts!: Table<ConflictRecord, string>;
+  formMemory!: Table<FormMemoryRecord, string>;
 
   constructor() {
     super(DB_NAME);
@@ -134,6 +152,26 @@ export class JobPilotDB extends Dexie {
       syncQueue: "id, entity, updatedAt",
       conflicts: "id, entity, createdAt",
     });
+
+    this.version(3).stores({
+      profile: "id, updatedAt",
+      experiences: "id, company, startDate, updatedAt",
+      educations: "id, institution, graduationYear, updatedAt",
+      skills: "id, name, category, updatedAt",
+      projects: "id, name, updatedAt",
+      customFields: "id, &fieldKey, updatedAt",
+      customFieldValues: "id, fieldId, updatedAt",
+      resumes: "id, title, updatedAt",
+      files: "id, mimeType, updatedAt",
+      resumeVersions: "id, resumeId, applicationId, createdAt",
+      applications: "id, company, status, appliedAt, normalizedUrl, updatedAt",
+      applicationEvents: "id, applicationId, createdAt",
+      fieldMappings: "id, domain, fingerprint",
+      settings: "key",
+      syncQueue: "id, entity, updatedAt",
+      conflicts: "id, entity, createdAt",
+      formMemory: "id, domain, updatedAt",
+    });
   }
 }
 
@@ -141,6 +179,46 @@ export const db = new JobPilotDB();
 
 function now(): string {
   return new Date().toISOString();
+}
+
+export function getFormMemoryKey(field: DetectedField): string {
+  const stableIdentity = field.autocomplete?.trim() || field.name?.trim() || field.id?.trim();
+  return (stableIdentity || `${field.label}|${field.inputType}`).toLowerCase();
+}
+
+export async function rememberFormAnswers(
+  domain: string,
+  url: string,
+  fields: DetectedField[],
+): Promise<void> {
+  if (!domain) return;
+  const existing = await db.formMemory.get(domain);
+  const merged = new Map((existing?.fields ?? []).map((field) => [field.key, field]));
+  const timestamp = now();
+  for (const field of fields) {
+    const value = field.currentValue?.trim();
+    const key = getFormMemoryKey(field);
+    if (!key || !value || field.inputType === "file") continue;
+    merged.set(key, {
+      key,
+      label: field.label,
+      inputType: field.inputType,
+      value,
+      url,
+      updatedAt: timestamp,
+    });
+  }
+  if (merged.size === 0) return;
+  await db.formMemory.put({
+    id: domain,
+    domain,
+    fields: [...merged.values()],
+    updatedAt: timestamp,
+  });
+}
+
+export async function getRememberedFormAnswers(domain: string): Promise<FormMemoryField[]> {
+  return (await db.formMemory.get(domain))?.fields ?? [];
 }
 
 export async function enqueueSync(

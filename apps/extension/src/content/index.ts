@@ -20,6 +20,7 @@ const sessions = new Map<string, { snapshots: Snapshot[] }>();
 let fieldCounter = 0;
 let observer: MutationObserver | null = null;
 let observerTimer: number | undefined;
+let valueChangeTimer: number | undefined;
 let lastFieldCount = -1;
 
 interface Snapshot {
@@ -787,18 +788,24 @@ function undoFill(sessionId: string): boolean {
 function ensureObserver(): void {
   if (observer) return;
 
+  const notifyFormChanged = (includeValues: boolean) => {
+    if (valueChangeTimer) window.clearTimeout(valueChangeTimer);
+    valueChangeTimer = window.setTimeout(() => {
+      const result = scanForm(false);
+      if (!includeValues && result.fields.length === lastFieldCount) return;
+      lastFieldCount = result.fields.length;
+      void chrome.runtime
+        .sendMessage({
+          type: "FORM_CHANGED",
+          data: { fieldCount: result.fields.length, fields: result.fields },
+        })
+        .catch(() => undefined);
+    }, 500);
+  };
+
   observer = new MutationObserver(() => {
     if (observerTimer) window.clearTimeout(observerTimer);
-    observerTimer = window.setTimeout(() => {
-      const previousFieldCount = lastFieldCount;
-      const result = scanForm(false);
-      if (result.fields.length !== previousFieldCount) {
-        lastFieldCount = result.fields.length;
-        void chrome.runtime
-          .sendMessage({ type: "FORM_CHANGED", data: { fieldCount: result.fields.length } })
-          .catch(() => undefined);
-      }
-    }, 500);
+    observerTimer = window.setTimeout(() => notifyFormChanged(false), 500);
   });
 
   observer.observe(document.documentElement, {
@@ -807,6 +814,9 @@ function ensureObserver(): void {
     attributes: true,
     attributeFilter: ["type", "name", "disabled", "hidden", "style", "class"],
   });
+
+  document.addEventListener("input", () => notifyFormChanged(true), true);
+  document.addEventListener("change", () => notifyFormChanged(true), true);
 }
 
 /* ------------------------------------------------------------------ */
