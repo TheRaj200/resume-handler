@@ -345,7 +345,8 @@ export type FieldMatchSource =
   | "fuzzy"
   | "stored"
   | "manual"
-  | "custom";
+  | "custom"
+  | "ai";
 
 export interface FieldMatch {
   field: DetectedField;

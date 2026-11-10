@@ -3,6 +3,8 @@ import { useLiveQuery } from "dexie-react-hooks";
 import {
   AUTOFILL_AUTO_THRESHOLD,
   AUTOFILL_REVIEW_THRESHOLD,
+  STORAGE_KEYS,
+  aiSettingsSchema,
   type DetectedField,
   type ExtensionMessage,
   type FieldMatch,
@@ -21,6 +23,8 @@ import {
   getFieldMappings,
   getProfile,
   getResumeBlob,
+  saveCustomField,
+  saveCustomFieldValue,
   saveApplication,
   saveFieldMapping,
   updateApplicationStatus,
@@ -32,8 +36,11 @@ import {
   isInjectableUrl,
   requestPagePermission,
   scanForm,
+  extractJd,
   undoFill,
 } from "../../lib/content-script";
+import { callAiJson } from "../../lib/ai-provider";
+import { getUnlockedApiKey } from "../../lib/crypto-vault";
 import {
   buildProfileFacts,
   fingerprintField,
@@ -118,6 +125,9 @@ export function AutofillWorkflow() {
   const [duplicateApp, setDuplicateApp] = useState<Application | null>(null);
   const [trackedAppId, setTrackedAppId] = useState<string | null>(null);
   const [isMarkedApplied, setIsMarkedApplied] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [learning, setLearning] = useState(false);
+  const [learnMessage, setLearnMessage] = useState<string | null>(null);
   const [autofillPreferences, setAutofillPreferences] = useState({
     autoThreshold: AUTOFILL_AUTO_THRESHOLD,
     reviewThreshold: AUTOFILL_REVIEW_THRESHOLD,
@@ -303,8 +313,8 @@ export function AutofillWorkflow() {
     updateRow(rowId, { selected: !row.selected });
   }
 
-  async function handleFill() {
-    const selectedRows = rows.filter(
+  async function handleFill(rowsToFill = rows) {
+    const selectedRows = rowsToFill.filter(
       (row) =>
         row.selected &&
         row.profileKey &&
@@ -393,6 +403,110 @@ export function AutofillWorkflow() {
       setError(cause instanceof Error ? cause.message : "Fill failed");
     } finally {
       setFilling(false);
+    }
+  }
+
+  async function handleGenerateAnswers(autoFill = false) {
+    if (!scanResult || activeTabId === null) return;
+    setGenerating(true);
+    setError(null);
+    try {
+      const apiKey = getUnlockedApiKey();
+      if (!apiKey) throw new Error("Settings mein API key unlock karo, phir Generate & fill try karo.");
+      const stored = await chrome.storage.local.get(STORAGE_KEYS.settings);
+      const parsedSettings = aiSettingsSchema.safeParse(stored[STORAGE_KEYS.settings]);
+      if (!parsedSettings.success) throw new Error("Settings mein AI provider configure karo.");
+
+      const jobDescription = (await extractJd(activeTabId))?.slice(0, 14_000) ?? "";
+      const targetRows = rows.filter(
+        (row) => !row.profileKey || row.field.tag === "textarea" || row.field.inputType === "text",
+      );
+      if (targetRows.length === 0) throw new Error("Generate karne ke liye koi text/unmatched field nahi mila.");
+
+      const answerResponse = await callAiJson<{ answers?: Record<string, string | null> }>({
+        settings: parsedSettings.data,
+        apiKey,
+        system: [
+          "You generate job application answers from verified candidate facts.",
+          "Return only JSON in the shape {\"answers\": {\"elementId\": string|null}}.",
+          "Never invent employers, dates, degrees, metrics, tools, achievements, salary, visa status, or experience.",
+          "Use natural concise professional language; it must sound like the candidate, not like an AI.",
+          "If the facts do not support an answer, return null.",
+        ].join(" "),
+        user: JSON.stringify({
+          jobDescription,
+          candidateFacts: facts.map((fact) => ({ key: fact.key, label: fact.label, value: fact.value })),
+          fields: targetRows.map((row) => ({
+            elementId: row.id,
+            label: row.field.label,
+            type: row.field.inputType,
+            placeholder: row.field.placeholder,
+            options: row.field.options,
+          })),
+        }),
+      });
+
+      const answers = answerResponse.answers ?? {};
+      const generatedRows: PlanRow[] = rows.map((row) => {
+        const answer = answers[row.id];
+        if (typeof answer !== "string" || !answer.trim()) return row;
+        return {
+          ...row,
+          profileKey: `ai.generated.${row.id}`,
+          value: answer.trim(),
+          confidence: 0.8,
+          requiresReview: true,
+          selected: true,
+          source: "ai" as const,
+          reason: "AI-generated from your saved facts; review before filling.",
+        };
+      });
+      setRows(generatedRows);
+      if (autoFill) await handleFill(generatedRows);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "AI generation failed");
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  async function handleLearnCurrentAnswers() {
+    if (!scanResult) return;
+    const candidates = rows.filter(
+      (row) => !row.profileKey && row.field.currentValue?.trim() && row.field.inputType !== "file",
+    );
+    if (candidates.length === 0) {
+      setLearnMessage("Koi naya unmatched answer nahi mila. Pehle form fill karke Rescan karo.");
+      return;
+    }
+    setLearning(true);
+    setLearnMessage(null);
+    try {
+      for (const row of candidates) {
+        const safeDomain = domain.replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase();
+        const safeLabel = row.field.label.replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase();
+        const fieldKey = `learned.${safeDomain || "site"}.${safeLabel || row.id}`.slice(0, 100);
+        const existing = await db.customFields.where("fieldKey").equals(fieldKey).first();
+        const field = await saveCustomField(existing ? {
+          label: row.field.label,
+          fieldKey,
+          fieldType: "text",
+          isSensitive: false,
+          required: false,
+        } : {
+          label: `${row.field.label} (${domain})`,
+          fieldKey,
+          fieldType: "text",
+          isSensitive: false,
+          required: false,
+        }, existing?.id);
+        await saveCustomFieldValue(field.id, row.field.currentValue?.trim() ?? "");
+      }
+      setLearnMessage(`${candidates.length} new answer(s) saved. Next scan mein mapping available hogi.`);
+    } catch (cause) {
+      setLearnMessage(cause instanceof Error ? cause.message : "Could not remember answers");
+    } finally {
+      setLearning(false);
     }
   }
 
@@ -509,6 +623,33 @@ export function AutofillWorkflow() {
               </label>
             </div>
 
+            <div className="flex flex-wrap items-center gap-2 border-t border-white/5 pt-2">
+              <Button
+                type="button"
+                variant="secondary"
+                   onClick={() => void handleGenerateAnswers(true)}
+                disabled={generating || filling}
+              >
+                {generating ? "Generating..." : "Generate natural answers"}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => void handleLearnCurrentAnswers()}
+                disabled={learning || generating}
+              >
+                {learning ? "Saving..." : "Remember new answers"}
+              </Button>
+              <span className="text-[10px] text-slate-500">
+                Manual answers ko Rescan ke baad save karein
+              </span>
+            </div>
+            {learnMessage ? (
+              <p className="rounded-xl border border-indigo-400/20 bg-indigo-500/10 px-3 py-2 text-[11px] text-indigo-200">
+                {learnMessage}
+              </p>
+            ) : null}
+
             {crossOriginOrigins.length > 0 ? (
               <p className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
                 Cross-origin iframe detected ({crossOriginOrigins.length}). Uske andar ke fields
@@ -610,9 +751,18 @@ export function AutofillWorkflow() {
                 ? `${reviewCount} fields review ke saath fill honge.`
                 : "High-confidence mappings auto-fill honge."}
             </p>
-            <Button onClick={() => void handleFill()} disabled={selectedCount === 0 || filling}>
-              {filling ? "Filling..." : `Fill selected (${selectedCount})`}
-            </Button>
+              <div className="flex flex-wrap justify-end gap-2">
+                <Button
+                  variant="secondary"
+                  onClick={() => void handleGenerateAnswers()}
+                  disabled={generating || filling}
+                >
+                  {generating ? "Generating..." : "Generate & fill"}
+                </Button>
+                <Button onClick={() => void handleFill()} disabled={selectedCount === 0 || filling || generating}>
+                  {filling ? "Filling..." : `Fill selected (${selectedCount})`}
+                </Button>
+              </div>
           </div>
 
           {report ? (
