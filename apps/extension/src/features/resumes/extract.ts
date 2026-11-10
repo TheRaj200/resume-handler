@@ -55,18 +55,27 @@ async function extractPdfText(file: File): Promise<ResumeExtraction> {
   try {
     const pages: string[] = [];
 
-    for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
-      const page = await document.getPage(pageNumber);
-      const content = await page.getTextContent();
-      let pageText = "";
+      for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
+        const page = await document.getPage(pageNumber);
+        const content = await page.getTextContent();
+        const positioned = content.items
+          .filter((item): item is typeof item & { str: string; transform: number[] } =>
+            "str" in item && Array.isArray(item.transform),
+          )
+          .map((item) => ({ text: item.str.trim(), x: item.transform[4] ?? 0, y: item.transform[5] ?? 0 }))
+          .filter((item) => item.text);
+        const lines: Array<{ y: number; items: Array<{ text: string; x: number }> }> = [];
+        for (const item of positioned) {
+          const line = lines.find((candidate) => Math.abs(candidate.y - item.y) <= 2.5);
+          if (line) line.items.push(item);
+          else lines.push({ y: item.y, items: [item] });
+        }
+        const pageText = lines
+          .sort((a, b) => b.y - a.y)
+          .map((line) => line.items.sort((a, b) => a.x - b.x).map((item) => item.text).join(" "))
+          .join("\n");
 
-      for (const item of content.items) {
-        if (!("str" in item)) continue;
-        pageText += item.str;
-        pageText += item.hasEOL ? "\n" : " ";
-      }
-
-      pages.push(pageText);
+        pages.push(pageText);
     }
 
     const text = normalizeExtractedText(pages.join("\n\n"));

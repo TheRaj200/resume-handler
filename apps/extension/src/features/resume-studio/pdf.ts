@@ -268,9 +268,9 @@ export async function generateResumePdf(resume: TailoredResume): Promise<Uint8Ar
     { label: resume.contact.email, url: resume.contact.email ? `mailto:${resume.contact.email}` : undefined },
     { label: resume.contact.phone },
     { label: resume.contact.location },
-    { label: resume.contact.linkedin, url: resume.contact.linkedin },
-    { label: resume.contact.github, url: resume.contact.github },
-    { label: resume.contact.portfolio, url: resume.contact.portfolio },
+    { label: resume.contact.linkedin ? "LinkedIn" : undefined, url: resume.contact.linkedin },
+    { label: resume.contact.github ? "GitHub" : undefined, url: resume.contact.github },
+    { label: resume.contact.portfolio ? "Portfolio" : undefined, url: resume.contact.portfolio },
   ].filter((item): item is { label: string; url?: string } => Boolean(item.label)).map((item) => ({
     ...item,
     label: compactContact(String(item.label)),

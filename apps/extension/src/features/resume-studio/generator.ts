@@ -161,7 +161,15 @@ function buildExperience(
   experiences: Experience[],
   analysis: JdAnalysis,
 ): TailoredResumeExperience[] {
-  return sortExperiences(experiences).map((experience) => {
+  const seen = new Set<string>();
+  return sortExperiences(experiences).filter((experience) => {
+    const key = [experience.company, experience.designation, experience.startDate ?? "", experience.endDate ?? ""]
+      .map((value) => value.trim().toLowerCase().replace(/\s+/g, " "))
+      .join("|");
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).map((experience) => {
     const normalizedFacts: Array<{ text: string; sourceIndexes: number[] }> = [];
     for (const [index, rawText] of experience.description.entries()) {
       for (const text of splitIntoResumeBullets(rawText.replace(/^[•\-*]+\s*/, ""), 8)) {
@@ -208,6 +216,7 @@ function buildSkills(skills: Skill[], analysis: JdAnalysis): TailoredResumeSkill
 }
 
 function buildProjects(projects: Project[], analysis: JdAnalysis): TailoredResumeProject[] {
+  const seen = new Set<string>();
   return [...projects]
     .sort(
       (a, b) =>
@@ -215,7 +224,13 @@ function buildProjects(projects: Project[], analysis: JdAnalysis): TailoredResum
           keywordOverlap(`${a.name} ${a.description} ${a.technologies.join(" ")}`, analysis.keywords) ||
         a.name.localeCompare(b.name),
     )
-    .slice(0, 4)
+    .filter((project) => {
+      const key = project.name.trim().toLowerCase().replace(/\s+/g, " ");
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 6)
     .map((project) => ({
       name: project.name,
       description: project.description.trim().slice(0, 520),
@@ -229,7 +244,7 @@ function buildEducation(educations: Education[]): TailoredResumeEducation[] {
   const seen = new Set<string>();
   return [...educations]
     .filter((education) => {
-      const key = `${education.institution}|${education.degree}|${education.graduationYear ?? ""}`.toLowerCase();
+      const key = `${education.institution}|${education.degree}`.toLowerCase().replace(/\s+/g, " ");
       if (seen.has(key)) return false;
       seen.add(key);
       return true;

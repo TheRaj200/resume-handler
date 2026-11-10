@@ -35,6 +35,13 @@ const SECTION_ALIASES: Record<SectionKey, string[]> = {
     "workhistory",
     "careerhistory",
     "relevantexperience",
+    "internship",
+    "internships",
+    "internexperience",
+    "internshipexperience",
+    "internshipsandexperience",
+    "workandinternships",
+    "experienceandinternships",
   ],
   education: [
     "education",
@@ -54,7 +61,7 @@ const SECTION_ALIASES: Record<SectionKey, string[]> = {
     "competencies",
     "skillsandtools",
   ],
-  projects: ["projects", "personalprojects", "academicprojects", "keyprojects", "selectedprojects"],
+  projects: ["projects", "personalprojects", "academicprojects", "keyprojects", "selectedprojects", "projectexperience"],
   certifications: [
     "certifications",
     "certificates",
@@ -163,6 +170,10 @@ export function splitSections(text: string): SectionedText {
 
 function cleanLines(lines: string[]): string[] {
   return lines.map((line) => line.trim()).filter(Boolean);
+}
+
+function normalizedKey(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "").trim();
 }
 
 function looksLikeEntryHeader(line: string): boolean {
@@ -436,7 +447,15 @@ function parseExperience(lines: string[]): ParsedResumeExperience[] {
     });
   }
 
-  return results;
+  const seen = new Set<string>();
+  return results.filter((item) => {
+    const key = [item.company, item.designation, item.startDate ?? "", item.endDate ?? "", item.description.join("|")]
+      .map(normalizedKey)
+      .join("|");
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function parseEducation(lines: string[]): ParsedResumeEducation[] {
@@ -480,7 +499,13 @@ function parseEducation(lines: string[]): ParsedResumeEducation[] {
     });
   }
 
-  return results;
+  const seen = new Set<string>();
+  return results.filter((item) => {
+    const key = [item.institution, item.degree, item.field ?? "", item.graduationYear ?? ""].map((value) => normalizedKey(String(value))).join("|");
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function cleanSkill(raw: string): string {
@@ -532,7 +557,27 @@ export function parseSkills(lines: string[]): ParsedResumeSkill[] {
 }
 
 function parseProjects(lines: string[]): ParsedResumeProject[] {
-  const blocks = splitBlocks(lines);
+  const initialBlocks = splitBlocks(lines);
+  const blocks = initialBlocks.length > 1 ? initialBlocks : (() => {
+    const cleaned = lines.map((line) => line.trim()).filter(Boolean);
+    const result: string[][] = [];
+    let current: string[] = [];
+    let hasMetadata = false;
+    for (const line of cleaned) {
+      const isBullet = /^[•*\-–—\u2022\u25cf\u25aa]/.test(line);
+      const isTech = /^(?:tech(?:nologies)?|stack|tools)\s*[:\-]/i.test(line);
+      const isUrl = URL_PATTERN.test(line);
+      if (!isBullet && current.length > 0 && hasMetadata && !isTech && !isUrl && line.length <= 100) {
+        result.push(current);
+        current = [];
+        hasMetadata = false;
+      }
+      current.push(line);
+      if (isTech || isUrl) hasMetadata = true;
+    }
+    if (current.length) result.push(current);
+    return result;
+  })();
   const results: ParsedResumeProject[] = [];
 
   for (const block of blocks) {
@@ -564,7 +609,13 @@ function parseProjects(lines: string[]): ParsedResumeProject[] {
     });
   }
 
-  return results;
+  const seen = new Set<string>();
+  return results.filter((item) => {
+    const key = normalizedKey(item.name) + "|" + normalizedKey(item.url ?? "");
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function inlineSkills(text: string): ParsedResumeSkill[] {

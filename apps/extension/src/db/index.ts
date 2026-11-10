@@ -788,7 +788,7 @@ export async function importParsedResume(
       if (options.include.experience) {
         const existing = await db.experiences.toArray();
         const keys = new Set(
-          existing.map((item) => dedupeKey(item.company, item.designation)),
+          existing.map((item) => dedupeKey(item.company, item.designation, item.startDate, item.endDate)),
         );
 
         if (options.mode === "replace") {
@@ -801,7 +801,7 @@ export async function importParsedResume(
             result.experience.skipped += 1;
             continue;
           }
-          const key = dedupeKey(item.company, item.designation);
+          const key = dedupeKey(item.company, item.designation, item.startDate, item.endDate);
           if (keys.has(key)) {
             result.experience.skipped += 1;
             continue;

@@ -147,6 +147,26 @@ export interface AiParseResult {
   warnings: string[];
 }
 
+function dedupeParsedResume(parsed: ParsedResume): ParsedResume {
+  const unique = <T>(items: T[], keyOf: (item: T) => string): T[] => {
+    const seen = new Set<string>();
+    return items.filter((item) => {
+      const key = keyOf(item);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  };
+  const normalize = (value: string | undefined) => (value ?? "").toLowerCase().replace(/\s+/g, " ").trim();
+  return {
+    ...parsed,
+    experience: unique(parsed.experience, (item) => [item.company, item.designation, item.startDate, item.endDate].map(normalize).join("|")),
+    education: unique(parsed.education, (item) => [item.institution, item.degree, item.field, String(item.graduationYear ?? "")].map(normalize).join("|")),
+    skills: unique(parsed.skills, (item) => normalize(item.name)),
+    projects: unique(parsed.projects, (item) => `${normalize(item.name)}|${normalize(item.url)}`),
+  };
+}
+
 export async function parseResumeWithAi(
   text: string,
   settings: AISettings,
@@ -175,5 +195,5 @@ export async function parseResumeWithAi(
     warnings.push("AI ne experience/education nahi nikala — resume text check karo.");
   }
 
-  return { parsed: result.data as ParsedResume, warnings };
+  return { parsed: dedupeParsedResume(result.data as ParsedResume), warnings };
 }

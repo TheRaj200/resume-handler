@@ -73,9 +73,9 @@ function ResumePreview({ resume }: { resume: TailoredResume }) {
     { label: resume.contact.email, href: resume.contact.email ? `mailto:${resume.contact.email}` : undefined },
     { label: resume.contact.phone },
     { label: resume.contact.location },
-    { label: resume.contact.linkedin, href: resume.contact.linkedin },
-    { label: resume.contact.github, href: resume.contact.github },
-    { label: resume.contact.portfolio, href: resume.contact.portfolio },
+    { label: resume.contact.linkedin ? "LinkedIn" : undefined, href: resume.contact.linkedin },
+    { label: resume.contact.github ? "GitHub" : undefined, href: resume.contact.github },
+    { label: resume.contact.portfolio ? "Portfolio" : undefined, href: resume.contact.portfolio },
   ].filter((item): item is { label: string; href?: string } => Boolean(item.label));
 
   return (
