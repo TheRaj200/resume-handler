@@ -176,6 +176,19 @@ function normalizedKey(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "").trim();
 }
 
+function splitEducationLine(value: string): { degree?: string; institution?: string } {
+  const parts = value
+    .split(/\s+[—–-]\s+|\s+\|\s+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (parts.length < 2) return {};
+  const degreeIndex = parts.findIndex((part) => DEGREE_PATTERN.test(part));
+  if (degreeIndex < 0) return {};
+  const degree = parts[degreeIndex];
+  const institution = parts.filter((_, index) => index !== degreeIndex).join(", ");
+  return { degree, institution };
+}
+
 function looksLikeEntryHeader(line: string): boolean {
   const trimmed = line.trim();
   if (!trimmed || trimmed.length > 140) return false;
@@ -475,8 +488,17 @@ function parseEducation(lines: string[]): ParsedResumeEducation[] {
       block.find((line) => line !== degreeLine) ??
       "";
 
-    const degree = degreeLine.replace(DATE_RANGE_PATTERN, "").trim();
-    const institution = institutionLine.replace(DATE_RANGE_PATTERN, "").trim();
+    let degree = degreeLine.replace(DATE_RANGE_PATTERN, "").trim();
+    let institution = institutionLine.replace(DATE_RANGE_PATTERN, "").trim();
+    const combined = splitEducationLine(degree);
+    if (combined.degree && combined.institution) {
+      degree = combined.degree;
+      institution = combined.institution;
+    } else if (!institution || normalizedKey(institution) === normalizedKey(degree)) {
+      const split = splitEducationLine(degree);
+      degree = split.degree ?? degree;
+      institution = split.institution ?? institution;
+    }
 
     if (!degree && !institution) continue;
 

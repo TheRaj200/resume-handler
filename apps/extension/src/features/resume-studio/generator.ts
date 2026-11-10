@@ -250,13 +250,26 @@ function buildEducation(educations: Education[]): TailoredResumeEducation[] {
       return true;
     })
     .sort((a, b) => (b.graduationYear ?? 0) - (a.graduationYear ?? 0))
-    .map((education) => ({
-      institution: education.institution,
-      degree: education.degree,
-      field: education.field,
+    .map((education) => {
+      const split = education.degree
+        .split(/\s+[—–-]\s+|\s+\|\s+/)
+        .map((part) => part.trim())
+        .filter(Boolean);
+      const degreePart = split.find((part) => /\b(bca|mca|bba|mba|bachelor|master|b\.?\s?tech|m\.?\s?tech|b\.?\s?sc|m\.?\s?sc|diploma)\b/i.test(part));
+      const institution = education.institution.trim().toLowerCase() === education.degree.trim().toLowerCase() && split.length > 1
+        ? split.filter((part) => part !== degreePart).join(", ")
+        : education.institution;
+      const degree = education.institution.trim().toLowerCase() === education.degree.trim().toLowerCase() && degreePart
+        ? degreePart
+        : education.degree;
+      return {
+        institution,
+        degree,
+        field: education.field,
       graduationYear: education.graduationYear,
       grade: education.grade,
-    }));
+      };
+    });
 }
 
 export function buildLocalResume(input: BuildResumeInput): TailoredResume {
