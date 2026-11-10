@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type DragEvent, type ReactNode } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
   STATUS_LABELS,
@@ -47,6 +47,62 @@ function statusTone(status: ApplicationStatus): BadgeTone {
     default:
       return "slate";
   }
+}
+
+/** Minimal HTML5 drag-to-reorder for a flat list of draggable sections. */
+function useDragReorder<T>(items: T[], onChange: (next: T[]) => void) {
+  const [dragging, setDragging] = useState<number | null>(null);
+
+  function onDragStart(index: number) {
+    setDragging(index);
+  }
+
+  function onDragOver(event: DragEvent, index: number) {
+    event.preventDefault();
+    if (dragging === null || dragging === index) return;
+    const next = [...items];
+    const [moved] = next.splice(dragging, 1);
+    next.splice(index, 0, moved!);
+    onChange(next);
+    setDragging(index);
+  }
+
+  function onDragEnd() {
+    setDragging(null);
+  }
+
+  return { dragging, onDragStart, onDragOver, onDragEnd };
+}
+
+function DragHandle({ onDragStart }: { onDragStart: () => void }) {
+  return (
+    <span
+      role="button"
+      aria-label="Drag to reorder"
+      className="drag-handle icon-press hidden h-6 w-6 shrink-0 place-items-center rounded-md text-slate-600 hover:bg-white/[0.06] hover:text-slate-300 sm:grid"
+      draggable
+      onDragStart={onDragStart}
+    >
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <circle cx="5" cy="4" r="1.4" />
+        <circle cx="11" cy="4" r="1.4" />
+        <circle cx="5" cy="8" r="1.4" />
+        <circle cx="11" cy="8" r="1.4" />
+        <circle cx="5" cy="12" r="1.4" />
+        <circle cx="11" cy="12" r="1.4" />
+      </svg>
+    </span>
+  );
+}
+
+interface Section {
+  id: string;
+  render: (dragProps: {
+    onDragStart: () => void;
+    onDragOver: (event: DragEvent) => void;
+    onDragEnd: () => void;
+    dragging: boolean;
+  }) => ReactNode;
 }
 
 function ChecklistItem({
@@ -136,14 +192,15 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
     };
   }, []);
 
-  return (
-    <div className="space-y-4">
-      <Card>
+  const [order, setOrder] = useState<string[]>(["page", "autofill", "stats", "checklist", "phase2"]);
+  const { dragging, onDragStart, onDragOver, onDragEnd } = useDragReorder(order, setOrder);
+
+  const sections: Record<string, Section["render"]> = {
+    page: () => (
+      <Card className="p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-[0.14em] text-slate-500">
-              Current page
-            </p>
+            <p className="text-[10px] uppercase tracking-[0.14em] text-slate-500">Current page</p>
             <p className="mt-1 truncate text-sm font-semibold text-slate-100">
               {context?.jobTitle ?? context?.title ?? "No job page detected"}
             </p>
@@ -157,15 +214,13 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
             <Badge>No JD</Badge>
           )}
         </div>
-
         <Button className="mt-3 w-full" onClick={() => void buildResumeForJob()}>
           {context?.hasJobPosting ? "Build resume for this job" : "Open resume builder"}
         </Button>
-
       </Card>
-
-      <AutofillWorkflow />
-
+    ),
+    autofill: () => <AutofillWorkflow />,
+    stats: () => (
       <div className="grid grid-cols-3 gap-2">
         {[
           { label: "Applications", value: applicationCount },
@@ -174,23 +229,22 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
         ].map((stat) => (
           <Card key={stat.label} className="p-3">
             <p className="text-lg font-semibold text-slate-100">{stat.value}</p>
-            <p className="mt-0.5 text-[10px] uppercase tracking-wide text-slate-500">
-              {stat.label}
-            </p>
+            <p className="mt-0.5 text-[10px] uppercase tracking-wide text-slate-500">{stat.label}</p>
           </Card>
         ))}
       </div>
-
-      <Card>
+    ),
+    checklist: () => (
+      <Card className="p-4">
         <div className="flex items-center justify-between">
           <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
             Setup checklist
           </h3>
-          <span className="text-xs font-semibold text-indigo-300">{completeness}%</span>
+          <span className="text-xs font-semibold text-brand-300">{completeness}%</span>
         </div>
         <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
           <div
-            className="h-full rounded-full bg-indigo-500 transition-all"
+            className="h-full rounded-full bg-brand-500 transition-all"
             style={{ width: `${completeness}%` }}
           />
         </div>
@@ -217,8 +271,9 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
           />
         </ul>
       </Card>
-
-      <Card>
+    ),
+    phase2: () => (
+      <Card className="p-4">
         <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
           Phase 2 status
         </h3>
@@ -249,6 +304,34 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
           </li>
         </ul>
       </Card>
+    ),
+  };
+
+  return (
+    <div>
+      <div className="mb-2 flex items-center justify-end">
+        <span className="text-[10px] text-slate-600">Drag cards to reorder</span>
+      </div>
+      <div className="space-y-4">
+        {order.map((id) => {
+          const render = sections[id];
+          if (!render) return null;
+          const index = order.indexOf(id);
+          return (
+            <div
+              key={id}
+              className={`group relative ${dragging === index ? "drag-over rounded-xl" : ""}`}
+              onDragOver={(event) => onDragOver(event, index)}
+              onDragEnd={onDragEnd}
+            >
+              <div className="absolute -left-1 top-3 z-10">
+                <DragHandle onDragStart={() => onDragStart(index)} />
+              </div>
+              {render({ onDragStart: () => onDragStart(index), onDragOver: () => {}, onDragEnd, dragging: dragging === index })}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -301,41 +384,45 @@ export function SidePanel() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="border-b border-white/10 px-4 py-3">
-        <div className="flex items-center justify-between">
+      <header className="sticky top-0 z-20 border-b border-white/[0.06] bg-[#0b0e14]/85 backdrop-blur-md">
+        <div className="flex items-center justify-between px-4 pt-3">
           <div className="flex items-center gap-2.5">
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-indigo-500 text-xs font-bold text-white">
+            <div className="grid h-8 w-8 place-items-center rounded-[10px] bg-gradient-to-br from-brand-400 to-brand-600 text-xs font-bold text-white shadow-sm shadow-brand-500/30">
               J
             </div>
             <div>
               <p className="text-sm font-semibold tracking-tight text-slate-100">JobPilot AI</p>
-              <p className="text-[10px] text-slate-500">Local-first · BYOK</p>
+              <p className="text-[10px] text-slate-500">One profile · Tailored resumes</p>
             </div>
           </div>
           <Badge tone="indigo">v0.1</Badge>
         </div>
 
-        <nav className="mt-3 flex gap-1 overflow-x-auto">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActive(tab.id)}
-              className={`shrink-0 rounded-lg px-2.5 py-1.5 text-[11px] font-medium transition ${
-                active === tab.id
-                  ? "bg-indigo-500/20 text-indigo-200"
-                  : "text-slate-500 hover:bg-white/[0.05] hover:text-slate-300"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <nav className="mt-2.5 flex gap-1 overflow-x-auto px-2 pb-2">
+          {TABS.map((tab) => {
+            const isActive = active === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActive(tab.id)}
+                className={`relative shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-medium transition ${
+                  isActive
+                    ? "bg-brand-500/15 text-brand-300"
+                    : "text-slate-500 hover:bg-white/[0.05] hover:text-slate-300"
+                }`}
+              >
+                {tab.label}
+                {isActive ? (
+                  <span className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-brand-400" />
+                ) : null}
+              </button>
+            );
+          })}
         </nav>
       </header>
 
       <main className="flex-1 px-4 py-4">
-        {active === "dashboard" ? (
-          <Dashboard onNavigate={(tab) => setActive(tab)} />
-        ) : null}
+        {active === "dashboard" ? <Dashboard onNavigate={(tab) => setActive(tab)} /> : null}
         {active === "profile" ? <ProfileEditor /> : null}
         {active === "resumes" ? <ResumeLibrary /> : null}
         {active === "studio" ? <ResumeStudio /> : null}
@@ -343,8 +430,8 @@ export function SidePanel() {
         {active === "settings" ? <SettingsPanel /> : null}
       </main>
 
-      <footer className="border-t border-white/10 px-4 py-2 text-center text-[10px] text-slate-600">
-        Phase 4 · BYOK · data stays in your browser
+      <footer className="border-t border-white/[0.06] px-4 py-2 text-center text-[10px] text-slate-600">
+        Data stays in your browser · BYOK
       </footer>
     </div>
   );

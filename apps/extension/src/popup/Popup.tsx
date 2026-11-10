@@ -77,24 +77,22 @@ export function Popup() {
     <div className="flex min-h-[520px] flex-col p-4">
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="grid h-9 w-9 place-items-center rounded-xl bg-indigo-500 text-sm font-bold text-white shadow-lg shadow-indigo-950/50">
+          <div className="grid h-9 w-9 place-items-center rounded-[12px] bg-gradient-to-br from-brand-400 to-brand-600 text-sm font-bold text-white shadow-sm shadow-brand-500/30">
             J
           </div>
           <div>
             <p className="text-sm font-semibold tracking-tight text-slate-100">JobPilot AI</p>
-            <p className="text-[11px] text-slate-500">One profile. Tailored resumes.</p>
+            <p className="text-[11px] text-slate-500">One profile · Tailored resumes</p>
           </div>
         </div>
         <Badge tone="indigo">v0.1</Badge>
       </header>
 
       <div className="mt-4">
-        <Card>
+        <Card className="p-4">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-[0.14em] text-slate-500">
-                Current page
-              </p>
+              <p className="text-[10px] uppercase tracking-[0.14em] text-slate-500">Current page</p>
               <p className="mt-1 truncate text-sm font-semibold text-slate-100">{heading}</p>
               <p className="mt-0.5 truncate text-xs text-slate-500">{subheading}</p>
             </div>
@@ -107,17 +105,21 @@ export function Popup() {
         </Card>
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <Button onClick={() => void openPanel("dashboard")}>Fill Form</Button>
-        <Button variant="secondary" onClick={() => void openPanel("dashboard")}>
-          Generate Resume
+      <div className="mt-3 space-y-2">
+        <Button className="w-full" onClick={() => void openPanel("dashboard")}>
+          Fill & autofill form
         </Button>
-        <Button variant="secondary" onClick={() => void openPanel("profile")}>
-          My Info
-        </Button>
-        <Button variant="secondary" onClick={() => void openPanel("applications")}>
-          Tracker
-        </Button>
+        <div className="grid grid-cols-3 gap-2">
+          <Button size="sm" variant="secondary" onClick={() => void openPanel("dashboard")}>
+            Resume
+          </Button>
+          <Button size="sm" variant="secondary" onClick={() => void openPanel("profile")}>
+            My Info
+          </Button>
+          <Button size="sm" variant="secondary" onClick={() => void openPanel("applications")}>
+            Tracker
+          </Button>
+        </div>
       </div>
 
       <div className="mt-5">
@@ -126,7 +128,7 @@ export function Popup() {
             Recent applications
           </h2>
           <button
-            className="text-[11px] text-indigo-300 hover:text-indigo-200"
+            className="text-[11px] text-brand-300 hover:text-brand-200"
             onClick={() => void openPanel("applications")}
           >
             View all
@@ -143,12 +145,10 @@ export function Popup() {
             {recent.slice(0, 3).map((application) => (
               <li
                 key={application.id}
-                className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2"
+                className="flex items-center justify-between gap-3 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-xs font-medium text-slate-200">
-                    {application.jobTitle}
-                  </p>
+                  <p className="truncate text-xs font-medium text-slate-200">{application.jobTitle}</p>
                   <p className="truncate text-[11px] text-slate-500">{application.company}</p>
                 </div>
                 <Badge tone={statusTone(application.status)}>
@@ -167,7 +167,7 @@ export function Popup() {
       ) : null}
 
       <footer className="mt-auto pt-4 text-center text-[10px] text-slate-600">
-        Phase 1 · local-first · BYOK
+        Local-first · BYOK · private
       </footer>
     </div>
   );

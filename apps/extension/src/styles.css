@@ -2,10 +2,26 @@
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --color-brand-300: #a5afff;
+  --color-brand-400: #8290ff;
+  --color-brand-500: #6d7bff;
+  --color-brand-600: #5a67f2;
+  --color-brand-700: #4a53d0;
 }
 
 :root {
   color-scheme: dark;
+  --bg: #0b0e14;
+  --surface-1: rgba(255, 255, 255, 0.03);
+  --surface-2: rgba(255, 255, 255, 0.06);
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.13);
+  --text-hi: #e9edf3;
+  --text-mid: #a6adbb;
+  --text-low: #69727f;
+  --accent: #6d7bff;
+  --accent-weak: rgba(109, 123, 255, 0.14);
+  --accent-ring: rgba(109, 123, 255, 0.35);
 }
 
 * {
@@ -20,12 +36,13 @@ body {
 
 body {
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(99, 102, 241, 0.18), transparent 60%),
-    radial-gradient(900px 500px at 110% 10%, rgba(16, 185, 129, 0.1), transparent 55%),
-    #0b1020;
-  color: #e5e7eb;
+    radial-gradient(1100px 520px at 15% -10%, rgba(109, 123, 255, 0.16), transparent 55%),
+    radial-gradient(820px 500px at 115% 8%, rgba(52, 211, 153, 0.06), transparent 50%),
+    var(--bg);
+  color: var(--text-hi);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 #root {
@@ -36,16 +53,48 @@ button {
   font: inherit;
 }
 
+::selection {
+  background: var(--accent-weak);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 2px;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.25);
+  background: var(--border-strong);
   border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
 }
 
 ::-webkit-scrollbar-track {
   background: transparent;
+}
+
+/* Shared motion utilities */
+.icon-press {
+  transition: transform 0.12s ease;
+}
+.icon-press:active {
+  transform: scale(0.92);
+}
+
+.drag-handle {
+  cursor: grab;
+  touch-action: none;
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+.drag-over {
+  box-shadow: 0 0 0 2px var(--accent-ring);
 }
