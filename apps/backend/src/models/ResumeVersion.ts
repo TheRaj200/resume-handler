@@ -7,6 +7,7 @@ const resumeVersionSchema = new Schema(
     resumeId: { type: String, required: true, index: true },
     applicationId: { type: String, index: true },
     content: { type: Schema.Types.Mixed, required: true },
+    sourceSnapshot: { type: Schema.Types.Mixed },
     jdSnapshot: String,
     jdHash: { type: String, required: true },
     versionNumber: { type: Number, required: true },

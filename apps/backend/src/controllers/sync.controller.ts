@@ -15,6 +15,11 @@ const syncChangeSchema = z.object({
 });
 
 const pushSchema = z.object({ changes: z.array(syncChangeSchema).max(100) });
+const applicationEventSchema = z.object({
+  status: z.enum(["DRAFT", "APPLIED", "SCREENING", "INTERVIEW", "OFFER", "REJECTED", "WITHDRAWN", "NO_RESPONSE"]),
+  note: z.string().optional(),
+  at: z.union([z.string(), z.date()]),
+});
 
 function getUserId(request: Request): string {
   if (!request.userId) throw new Error("Authenticated user missing.");
@@ -94,6 +99,8 @@ export class SyncController {
         }
 
         const record = parsed.data;
+        const rawEvents = (change.record as { events?: unknown } | undefined)?.events;
+        const parsedEvents = z.array(applicationEventSchema).safeParse(rawEvents);
         const data = {
           _id: change.entityId,
           userId: owner,
@@ -108,10 +115,10 @@ export class SyncController {
           notes: record.notes,
           resumeVersionId: record.resumeVersionId,
           version: existing ? existing.version + 1 : 1,
-          events: existing?.events?.map((event) => ({
+          events: (parsedEvents.success ? parsedEvents.data : existing?.events)?.map((event) => ({
             status: event.status,
             note: event.note ?? undefined,
-            at: event.at,
+            at: new Date(event.at),
           })) ?? [],
         };
 
