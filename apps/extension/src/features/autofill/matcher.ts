@@ -692,8 +692,16 @@ function blockedReason(field: DetectedField): string | null {
 
 export function resolveValue(field: DetectedField, fact: ProfileFact): FieldValue {
   if (field.inputType === "checkbox") {
-    const value = fact.value.toLowerCase();
-    return value === "true" || value === "yes" || value === "1";
+    const value = normalize(fact.value);
+    if (["true", "yes", "1"].includes(value)) return true;
+    if (["false", "no", "0"].includes(value)) return false;
+
+    const target = normalize(field.label || field.name || field.id || "");
+    if (!target) return false;
+    return value
+      .split(/[,;|\n]/)
+      .map((item) => normalize(item))
+      .some((item) => item === target || item.includes(target) || target.includes(item));
   }
 
   if (field.inputType === "select" || field.inputType === "radio") {
@@ -795,6 +803,16 @@ export function matchFields(
 
     const fact = factsByKey.get(best.key)!;
     const value = resolveValue(field, fact);
+
+    if (
+      field.inputType === "checkbox" &&
+      value === false &&
+      !/^(true|false|yes|no|1|0)$/i.test(fact.value.trim())
+    ) {
+      unmatched.push({ field, suggestedKey: best.key, reason: "This option is not present in saved answers" });
+      continue;
+    }
+
     if (value === null || value === undefined || value === "") {
       unmatched.push({ field, suggestedKey: best.key, reason: "Profile value is empty" });
       continue;

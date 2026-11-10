@@ -131,11 +131,9 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
           )}
         </div>
 
-        {context?.hasJobPosting ? (
-          <Button className="mt-3 w-full" onClick={() => onNavigate("studio")}>
-            Build resume for this job
-          </Button>
-        ) : null}
+        <Button className="mt-3 w-full" onClick={() => onNavigate("studio")}>
+          {context?.hasJobPosting ? "Build resume for this job" : "Open resume builder"}
+        </Button>
 
       </Card>
 
