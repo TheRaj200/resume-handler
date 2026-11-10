@@ -65,6 +65,14 @@ function wrapText(
   return lines;
 }
 
+function projectBullets(description: string): string[] {
+  const parts = description
+    .split(/(?<=[.!?])\s+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  return parts.length > 1 ? parts.slice(0, 4) : [description.trim()];
+}
+
 class ResumeWriter {
   private page: PDFPage;
   private y: number;
@@ -259,7 +267,9 @@ export async function generateResumePdf(resume: TailoredResume): Promise<Uint8Ar
       if (project.technologies.length > 0) {
         writer.text(project.technologies.join(", "), { size: 8.8, color: MUTED });
       }
-      if (project.description) writer.text(project.description, { size: 9.4, gapAfter: 1.5 });
+       for (const description of projectBullets(project.description)) {
+         if (description) writer.bullet(description);
+       }
       if (project.url) writer.text(project.url, { size: 8.6, color: MUTED });
       writer.space(3);
     }

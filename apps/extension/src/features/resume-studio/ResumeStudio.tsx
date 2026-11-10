@@ -57,6 +57,14 @@ function formatDate(value: string): string {
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
 }
 
+function projectBullets(description: string): string[] {
+  const parts = description
+    .split(/(?<=[.!?])\s+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  return parts.length > 1 ? parts.slice(0, 4) : [description.trim()];
+}
+
 function ResumePreview({ resume }: { resume: TailoredResume }) {
   const contact = [
     resume.contact.email,
@@ -68,7 +76,7 @@ function ResumePreview({ resume }: { resume: TailoredResume }) {
   ].filter(Boolean);
 
   return (
-    <div className="mx-auto w-full max-w-[360px] rounded-lg bg-white px-5 py-6 text-slate-900 shadow-xl">
+    <div className="mx-auto min-h-[842px] w-full max-w-[620px] rounded-lg bg-white px-9 py-9 text-slate-900 shadow-xl">
       <h1 className="text-[18px] font-bold leading-tight">{resume.contact.name}</h1>
       <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-indigo-700">
         {resume.targetRole}
@@ -130,7 +138,14 @@ function ResumePreview({ resume }: { resume: TailoredResume }) {
             <div key={`${project.name}-${index}`} className="mt-1.5">
               <p className="text-[8.5px] font-bold">{project.name}</p>
               <p className="text-[7.5px] text-slate-500">{project.technologies.join(", ")}</p>
-              <p className="text-[8px] leading-relaxed">{project.description}</p>
+              <ul className="mt-1 space-y-0.5 text-[8px] leading-relaxed">
+                {projectBullets(project.description).map((bullet, bulletIndex) => (
+                  <li key={bulletIndex} className="flex gap-1">
+                    <span className="text-slate-500">-</span>
+                    <span>{bullet}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </section>

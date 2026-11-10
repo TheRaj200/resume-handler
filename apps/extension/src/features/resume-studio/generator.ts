@@ -111,7 +111,7 @@ function buildContact(profile: Profile | undefined): TailoredResume["contact"] {
 function buildSummary(profile: Profile | undefined, targetRole: string): string {
   const base = profile?.summary?.trim() || profile?.headline?.trim() || "";
   const targetLine = targetRole.trim() ? `Targeting ${targetRole.trim()} roles.` : "";
-  return [base, targetLine].filter(Boolean).join(" ").slice(0, 2000);
+  return [base, targetLine].filter(Boolean).join(" ").slice(0, 650);
 }
 
 function safeProjectUrl(value?: string): string | undefined {
@@ -134,16 +134,31 @@ function buildExperience(
   analysis: JdAnalysis,
 ): TailoredResumeExperience[] {
   return sortExperiences(experiences).map((experience) => {
-    const bullets: ResumeBullet[] = experience.description
-      .map((text, index) => ({
-        text: text.trim(),
-        sourceFactIds: [experienceBulletFactId(experience.id, index)],
+    const normalizedFacts: Array<{ text: string; sourceIndexes: number[] }> = [];
+    for (const [index, rawText] of experience.description.entries()) {
+      const text = rawText.trim().replace(/^[•\-*]+\s*/, "");
+      if (!text) continue;
+      const continuation = /^[a-z]|^(and|or|with|within|including|across|for)\b/i.test(text);
+      const previous = normalizedFacts[normalizedFacts.length - 1];
+      if (continuation && previous) {
+        previous.text = `${previous.text.replace(/[.,;:]?$/, ",")} ${text}`;
+        previous.sourceIndexes.push(index);
+      } else {
+        normalizedFacts.push({ text, sourceIndexes: [index] });
+      }
+    }
+
+    const bullets: ResumeBullet[] = normalizedFacts
+      .map(({ text, sourceIndexes }, index) => ({
+        text: text.slice(0, 360),
+        sourceFactIds: sourceIndexes.map((sourceIndex) => experienceBulletFactId(experience.id, sourceIndex)),
         origin: "user" as const,
         overlap: keywordOverlap(text, analysis.keywords),
         index,
       }))
       .filter((bullet) => bullet.text.length > 0)
       .sort((a, b) => b.overlap - a.overlap || a.index - b.index)
+      .slice(0, 6)
       .map(({ text, sourceFactIds, origin }) => ({ text, sourceFactIds, origin }));
 
     return {
@@ -163,6 +178,7 @@ function buildSkills(skills: Skill[], analysis: JdAnalysis): TailoredResumeSkill
         keywordOverlap(b.name, analysis.keywords) - keywordOverlap(a.name, analysis.keywords) ||
         a.name.localeCompare(b.name),
     )
+    .slice(0, 24)
     .map((skill) => ({
       name: skill.name,
       category: skill.category?.trim() || "General",
@@ -178,10 +194,11 @@ function buildProjects(projects: Project[], analysis: JdAnalysis): TailoredResum
           keywordOverlap(`${a.name} ${a.description} ${a.technologies.join(" ")}`, analysis.keywords) ||
         a.name.localeCompare(b.name),
     )
+    .slice(0, 4)
     .map((project) => ({
       name: project.name,
-      description: project.description,
-      technologies: project.technologies,
+      description: project.description.trim().slice(0, 520),
+      technologies: project.technologies.slice(0, 10),
       url: safeProjectUrl(project.url),
       sourceFactIds: [`project:${project.id}`],
     }));
