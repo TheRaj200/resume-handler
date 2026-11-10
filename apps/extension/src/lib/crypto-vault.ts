@@ -117,7 +117,7 @@ export async function restoreVaultSession(): Promise<void> {
 
 function armAutoLock(): void {
   if (autoLockTimer) window.clearTimeout(autoLockTimer);
-  autoLockTimer = window.setTimeout(() => void lockVault(), AUTO_LOCK_MS);
+  autoLockTimer = window.setTimeout(() => void lockVault(false), AUTO_LOCK_MS);
 }
 
 export async function hasStoredApiKey(): Promise<boolean> {
@@ -192,12 +192,12 @@ export function getUnlockedApiKey(): string | null {
   return unlockedApiKey;
 }
 
-export async function lockVault(): Promise<void> {
+export async function lockVault(clearRemembered = true): Promise<void> {
   unlockedApiKey = null;
   if (autoLockTimer) window.clearTimeout(autoLockTimer);
   autoLockTimer = undefined;
   await chrome.storage.session.remove(STORAGE_KEYS.vaultSession);
-  await chrome.storage.local.remove(STORAGE_KEYS.vaultUnlockCache);
+  if (clearRemembered) await chrome.storage.local.remove(STORAGE_KEYS.vaultUnlockCache);
 }
 
 export async function deleteStoredApiKey(): Promise<void> {
