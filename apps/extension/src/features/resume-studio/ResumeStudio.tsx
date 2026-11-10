@@ -24,7 +24,7 @@ import {
   callAiJson,
   hasProviderPermission,
 } from "../../lib/ai-provider";
-import { getUnlockedApiKey } from "../../lib/crypto-vault";
+import { getUnlockedApiKey, restoreVaultSession } from "../../lib/crypto-vault";
 import { Badge, Button, Card, EmptyState, Field, inputClass } from "../../components/ui";
 import {
   analyzeJd,
@@ -205,6 +205,7 @@ export function ResumeStudio() {
 
   useEffect(() => {
     void (async () => {
+      await restoreVaultSession();
       const key = getUnlockedApiKey();
       const stored = await chrome.storage.local.get(STORAGE_KEYS.settings);
       const parsed = aiSettingsSchema.safeParse(stored[STORAGE_KEYS.settings]);
@@ -232,6 +233,7 @@ export function ResumeStudio() {
       if (pending.targetRole?.trim()) setTargetRole(pending.targetRole);
       if (pending.targetCompany?.trim()) setTargetCompany(pending.targetCompany);
       if (pending.autoGenerate) {
+        await restoreVaultSession();
         setMode(getUnlockedApiKey() ? "ai" : "local");
         setAutoGenerate(true);
       }

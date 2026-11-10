@@ -82,6 +82,7 @@ export const STORAGE_KEYS = {
   syncAccessToken: "jobpilot.sync.accessToken",
   syncUser: "jobpilot.sync.user",
   resumeJobContext: "jobpilot.resume.jobContext",
+  vaultUnlockCache: "jobpilot.vault.unlockCache",
   encryptedApiKey: "jobpilot.apiKey.encrypted",
   keySalt: "jobpilot.apiKey.salt",
   vaultSession: "jobpilot.apiKey.vaultSession",

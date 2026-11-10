@@ -11,6 +11,12 @@ interface EncryptedVaultPayload {
   iv: string;
 }
 
+interface VaultUnlockCache {
+  version: 1;
+  key: string;
+  expiresAt: number;
+}
+
 let unlockedApiKey: string | null = null;
 let autoLockTimer: number | undefined;
 
@@ -52,9 +58,61 @@ async function deriveKey(
     },
     material,
     { name: "AES-GCM", length: 256 },
-    false,
+    true,
     ["encrypt", "decrypt"],
   );
+}
+
+async function cacheUnlockKey(key: CryptoKey, hours: number): Promise<void> {
+  if (hours <= 0) {
+    await chrome.storage.local.remove(STORAGE_KEYS.vaultUnlockCache);
+    return;
+  }
+  const raw = await crypto.subtle.exportKey("raw", key);
+  await chrome.storage.local.set({
+    [STORAGE_KEYS.vaultUnlockCache]: {
+      version: 1,
+      key: bytesToBase64(new Uint8Array(raw)),
+      expiresAt: Date.now() + hours * 60 * 60 * 1000,
+    } satisfies VaultUnlockCache,
+  });
+}
+
+export async function restoreVaultSession(): Promise<void> {
+  if (unlockedApiKey) return;
+  const stored = await chrome.storage.local.get([
+    STORAGE_KEYS.vaultUnlockCache,
+    STORAGE_KEYS.encryptedApiKey,
+    STORAGE_KEYS.keySalt,
+  ]);
+  const cache = stored[STORAGE_KEYS.vaultUnlockCache] as VaultUnlockCache | undefined;
+  const payload = stored[STORAGE_KEYS.encryptedApiKey] as EncryptedVaultPayload | undefined;
+  const saltValue = stored[STORAGE_KEYS.keySalt];
+  if (!cache || cache.version !== 1 || cache.expiresAt <= Date.now() || !payload || typeof saltValue !== "string") {
+    if (cache) await chrome.storage.local.remove(STORAGE_KEYS.vaultUnlockCache);
+    return;
+  }
+  try {
+    const key = await crypto.subtle.importKey(
+      "raw",
+      base64ToBytes(cache.key),
+      { name: "AES-GCM" },
+      true,
+      ["decrypt"],
+    );
+    const plaintext = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: base64ToBytes(payload.iv) },
+      key,
+      base64ToBytes(payload.ciphertext),
+    );
+    unlockedApiKey = new TextDecoder().decode(plaintext);
+    await chrome.storage.session.set({
+      [STORAGE_KEYS.vaultSession]: { unlockedAt: new Date().toISOString() },
+    });
+    armAutoLock();
+  } catch {
+    await chrome.storage.local.remove(STORAGE_KEYS.vaultUnlockCache);
+  }
 }
 
 function armAutoLock(): void {
@@ -67,7 +125,7 @@ export async function hasStoredApiKey(): Promise<boolean> {
   return typeof stored[STORAGE_KEYS.encryptedApiKey] === "object";
 }
 
-export async function saveApiKey(passphrase: string, apiKey: string): Promise<void> {
+export async function saveApiKey(passphrase: string, apiKey: string, rememberHours = 24): Promise<void> {
   if (passphrase.length < 10) throw new Error("Vault passphrase must be at least 10 characters.");
   if (!apiKey.trim()) throw new Error("API key cannot be empty.");
 
@@ -92,13 +150,14 @@ export async function saveApiKey(passphrase: string, apiKey: string): Promise<vo
   });
 
   unlockedApiKey = apiKey.trim();
+  await cacheUnlockKey(key, rememberHours);
   await chrome.storage.session.set({
     [STORAGE_KEYS.vaultSession]: { unlockedAt: new Date().toISOString() },
   });
   armAutoLock();
 }
 
-export async function unlockVault(passphrase: string): Promise<void> {
+export async function unlockVault(passphrase: string, rememberHours = 24): Promise<void> {
   const stored = await chrome.storage.local.get([
     STORAGE_KEYS.encryptedApiKey,
     STORAGE_KEYS.keySalt,
@@ -118,6 +177,7 @@ export async function unlockVault(passphrase: string): Promise<void> {
       base64ToBytes(payload.ciphertext),
     );
     unlockedApiKey = new TextDecoder().decode(plaintext);
+    await cacheUnlockKey(key, rememberHours);
     await chrome.storage.session.set({
       [STORAGE_KEYS.vaultSession]: { unlockedAt: new Date().toISOString() },
     });
@@ -137,6 +197,7 @@ export async function lockVault(): Promise<void> {
   if (autoLockTimer) window.clearTimeout(autoLockTimer);
   autoLockTimer = undefined;
   await chrome.storage.session.remove(STORAGE_KEYS.vaultSession);
+  await chrome.storage.local.remove(STORAGE_KEYS.vaultUnlockCache);
 }
 
 export async function deleteStoredApiKey(): Promise<void> {

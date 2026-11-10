@@ -43,7 +43,7 @@ import {
   undoFill,
 } from "../../lib/content-script";
 import { callAiJson } from "../../lib/ai-provider";
-import { getUnlockedApiKey } from "../../lib/crypto-vault";
+import { getUnlockedApiKey, restoreVaultSession } from "../../lib/crypto-vault";
 import {
   buildProfileFacts,
   fingerprintField,
@@ -443,6 +443,7 @@ export function AutofillWorkflow() {
     setGenerating(true);
     setError(null);
     try {
+      await restoreVaultSession();
       const apiKey = getUnlockedApiKey();
       if (!apiKey) throw new Error("Settings mein API key unlock karo, phir Generate & fill try karo.");
       const stored = await chrome.storage.local.get(STORAGE_KEYS.settings);

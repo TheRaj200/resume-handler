@@ -33,6 +33,7 @@ import {
   getUnlockedApiKey,
   hasStoredApiKey,
   lockVault,
+  restoreVaultSession,
   saveApiKey,
   unlockVault,
 } from "../../lib/crypto-vault";
@@ -53,6 +54,7 @@ export function SettingsPanel() {
   const [passphrase, setPassphrase] = useState("");
   const [vaultState, setVaultState] = useState<"empty" | "locked" | "unlocked">("empty");
   const [vaultBusy, setVaultBusy] = useState(false);
+  const [rememberVaultUnlock, setRememberVaultUnlock] = useState(true);
   const [endpointGranted, setEndpointGranted] = useState<boolean | null>(null);
   const [endpointBusy, setEndpointBusy] = useState(false);
   const [connectionState, setConnectionState] = useState<"idle" | "testing" | "success" | "error">("idle");
@@ -87,6 +89,7 @@ export function SettingsPanel() {
       if (!cancelled && typeof syncIdentity[STORAGE_KEYS.syncUser] === "string") {
         setSyncUser(String(syncIdentity[STORAGE_KEYS.syncUser]));
       }
+      await restoreVaultSession();
       const storedKey = await hasStoredApiKey();
       if (!cancelled) setVaultState(getUnlockedApiKey() ? "unlocked" : storedKey ? "locked" : "empty");
     })();
@@ -155,6 +158,7 @@ export function SettingsPanel() {
     try {
       const parsed = aiSettingsSchema.safeParse(settings);
       if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Invalid settings");
+      await restoreVaultSession();
       const key = getUnlockedApiKey();
       if (!key) throw new Error("Vault locked hai. Pehle API key unlock karo.");
       if (!(await hasProviderPermission(parsed.data))) {
@@ -265,7 +269,7 @@ export function SettingsPanel() {
     setVaultBusy(true);
     setError(null);
     try {
-      await saveApiKey(passphrase, apiKey);
+      await saveApiKey(passphrase, apiKey, rememberVaultUnlock ? 24 : 0);
       setApiKey("");
       setPassphrase("");
       setVaultState("unlocked");
@@ -280,7 +284,7 @@ export function SettingsPanel() {
     setVaultBusy(true);
     setError(null);
     try {
-      await unlockVault(passphrase);
+      await unlockVault(passphrase, rememberVaultUnlock ? 24 : 0);
       setPassphrase("");
       setVaultState("unlocked");
     } catch (cause) {
@@ -570,6 +574,16 @@ export function SettingsPanel() {
             </Field>
           </>
         )}
+
+        <label className="flex items-center gap-2 text-[11px] text-slate-400">
+          <input
+            type="checkbox"
+            className="accent-indigo-500"
+            checked={rememberVaultUnlock}
+            onChange={(event) => setRememberVaultUnlock(event.target.checked)}
+          />
+          Keep vault unlocked for 24 hours (passphrase store nahi hoti)
+        </label>
 
         <div className="flex flex-wrap gap-2">
           {vaultState === "locked" ? (

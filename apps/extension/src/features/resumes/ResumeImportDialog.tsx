@@ -17,7 +17,7 @@ import {
   type ResumeImportSelection,
 } from "../../db";
 import { hasProviderPermission } from "../../lib/ai-provider";
-import { getUnlockedApiKey } from "../../lib/crypto-vault";
+import { getUnlockedApiKey, restoreVaultSession } from "../../lib/crypto-vault";
 import { Badge, Button, Field, inputClass } from "../../components/ui";
 import { extractResumeText, inferResumeExtension, looksLikeScannedPdf, truncateForParsing } from "./extract";
 import { parseResumeLocally } from "./parser";
@@ -239,6 +239,7 @@ export function ResumeImportDialog({
     setError(null);
 
     try {
+      await restoreVaultSession();
       const apiKey = getUnlockedApiKey();
       if (!apiKey) {
         throw new Error("AI vault locked hai. Settings → API Key Vault me unlock karo.");
