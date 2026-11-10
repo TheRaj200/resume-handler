@@ -114,6 +114,21 @@ function buildSummary(profile: Profile | undefined, targetRole: string): string 
   return [base, targetLine].filter(Boolean).join(" ").slice(0, 2000);
 }
 
+function safeProjectUrl(value?: string): string | undefined {
+  const candidate = value?.trim();
+  if (!candidate) return undefined;
+  const withProtocol = /^[a-z][a-z\d+.-]*:\/\//i.test(candidate)
+    ? candidate
+    : `https://${candidate}`;
+  try {
+    const url = new URL(withProtocol);
+    if (!url.hostname.includes(".") && url.hostname !== "localhost") return undefined;
+    return url.toString();
+  } catch {
+    return undefined;
+  }
+}
+
 function buildExperience(
   experiences: Experience[],
   analysis: JdAnalysis,
@@ -167,7 +182,7 @@ function buildProjects(projects: Project[], analysis: JdAnalysis): TailoredResum
       name: project.name,
       description: project.description,
       technologies: project.technologies,
-      url: project.url,
+      url: safeProjectUrl(project.url),
       sourceFactIds: [`project:${project.id}`],
     }));
 }
