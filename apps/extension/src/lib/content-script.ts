@@ -12,6 +12,18 @@ export function isInjectableUrl(url?: string): boolean {
   return Boolean(url && /^https?:/i.test(url));
 }
 
+export async function requestPagePermission(url?: string): Promise<boolean> {
+  if (!isInjectableUrl(url)) return false;
+  const pageUrl = new URL(url as string);
+  const origin = `${pageUrl.protocol}//${pageUrl.host}/*`;
+  try {
+    if (await chrome.permissions.contains({ origins: [origin] })) return true;
+    return await chrome.permissions.request({ origins: [origin] });
+  } catch {
+    return false;
+  }
+}
+
 export async function getActiveTab(): Promise<chrome.tabs.Tab | undefined> {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   return tab;

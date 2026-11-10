@@ -30,6 +30,7 @@ import {
   getActiveTab,
   getPageContext,
   isInjectableUrl,
+  requestPagePermission,
   scanForm,
   undoFill,
 } from "../../lib/content-script";
@@ -151,6 +152,9 @@ export function AutofillWorkflow() {
       if (!tab?.id) throw new Error("No active tab found.");
       if (!tab.url || !isInjectableUrl(tab.url)) {
         throw new Error("This page does not allow injection.");
+      }
+      if (!(await requestPagePermission(tab.url))) {
+        throw new Error("Page permission required. Allow access to this site and scan again.");
       }
 
       const result = await scanForm(tab.id);
