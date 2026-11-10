@@ -36,6 +36,7 @@ import {
   buildLocalResume,
   validateFactLock,
   validateResumeShape,
+  splitIntoResumeBullets,
   type AiResumeSuggestions,
   type ResumeSourceData,
 } from "./generator";
@@ -57,12 +58,13 @@ function formatDate(value: string): string {
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
 }
 
-function projectBullets(description: string): string[] {
-  const parts = description
-    .split(/(?<=[.!?])\s+/)
-    .map((part) => part.trim())
-    .filter(Boolean);
-  return parts.length > 1 ? parts.slice(0, 4) : [description.trim()];
+function compactContact(value: string): string {
+  try {
+    const url = new URL(value);
+    return `${url.hostname.replace(/^www\./, "")}${url.pathname.replace(/\/$/, "")}`;
+  } catch {
+    return value;
+  }
 }
 
 function ResumePreview({ resume }: { resume: TailoredResume }) {
@@ -73,7 +75,7 @@ function ResumePreview({ resume }: { resume: TailoredResume }) {
     resume.contact.linkedin,
     resume.contact.github,
     resume.contact.portfolio,
-  ].filter(Boolean);
+  ].filter(Boolean).map((value) => compactContact(String(value)));
 
   return (
     <div className="mx-auto min-h-[842px] w-full max-w-[620px] rounded-lg bg-white px-9 py-9 text-slate-900 shadow-xl">
@@ -139,7 +141,7 @@ function ResumePreview({ resume }: { resume: TailoredResume }) {
               <p className="text-[8.5px] font-bold">{project.name}</p>
               <p className="text-[7.5px] text-slate-500">{project.technologies.join(", ")}</p>
               <ul className="mt-1 space-y-0.5 text-[8px] leading-relaxed">
-                {projectBullets(project.description).map((bullet, bulletIndex) => (
+                {splitIntoResumeBullets(project.description, 4).map((bullet, bulletIndex) => (
                   <li key={bulletIndex} className="flex gap-1">
                     <span className="text-slate-500">-</span>
                     <span>{bullet}</span>

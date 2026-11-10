@@ -1,5 +1,6 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 import type { TailoredResume } from "@jobpilot/shared";
+import { splitIntoResumeBullets } from "./generator";
 
 const PAGE_WIDTH = 595.28;
 const PAGE_HEIGHT = 841.89;
@@ -65,12 +66,13 @@ function wrapText(
   return lines;
 }
 
-function projectBullets(description: string): string[] {
-  const parts = description
-    .split(/(?<=[.!?])\s+/)
-    .map((part) => part.trim())
-    .filter(Boolean);
-  return parts.length > 1 ? parts.slice(0, 4) : [description.trim()];
+function compactContact(value: string): string {
+  try {
+    const url = new URL(value);
+    return `${url.hostname.replace(/^www\./, "")}${url.pathname.replace(/\/$/, "")}`;
+  } catch {
+    return value;
+  }
 }
 
 class ResumeWriter {
@@ -218,7 +220,7 @@ export async function generateResumePdf(resume: TailoredResume): Promise<Uint8Ar
     resume.contact.linkedin,
     resume.contact.github,
     resume.contact.portfolio,
-  ].filter(Boolean);
+  ].filter(Boolean).map((value) => compactContact(String(value)));
 
   if (contact.length > 0) {
     writer.text(contact.join("  |  "), { size: 9, color: MUTED, gapAfter: 4 });
@@ -267,7 +269,7 @@ export async function generateResumePdf(resume: TailoredResume): Promise<Uint8Ar
       if (project.technologies.length > 0) {
         writer.text(project.technologies.join(", "), { size: 8.8, color: MUTED });
       }
-       for (const description of projectBullets(project.description)) {
+       for (const description of splitIntoResumeBullets(project.description, 4)) {
          if (description) writer.bullet(description);
        }
       if (project.url) writer.text(project.url, { size: 8.6, color: MUTED });

@@ -129,6 +129,34 @@ function safeProjectUrl(value?: string): string | undefined {
   }
 }
 
+export function splitIntoResumeBullets(value: string, limit = 6): string[] {
+  const text = value.replace(/\s+/g, " ").trim();
+  if (!text) return [];
+  const sentences = text
+    .split(/(?<=[.!?])\s+|;\s+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const result: string[] = [];
+  for (const sentence of sentences) {
+    if (sentence.length <= 210) {
+      result.push(sentence);
+      continue;
+    }
+    let current = "";
+    for (const piece of sentence.split(/,\s+/)) {
+      const candidate = current ? `${current}, ${piece}` : piece;
+      if (candidate.length <= 210) {
+        current = candidate;
+      } else {
+        if (current) result.push(current);
+        current = piece;
+      }
+    }
+    if (current) result.push(current);
+  }
+  return result.slice(0, limit);
+}
+
 function buildExperience(
   experiences: Experience[],
   analysis: JdAnalysis,
@@ -136,21 +164,14 @@ function buildExperience(
   return sortExperiences(experiences).map((experience) => {
     const normalizedFacts: Array<{ text: string; sourceIndexes: number[] }> = [];
     for (const [index, rawText] of experience.description.entries()) {
-      const text = rawText.trim().replace(/^[•\-*]+\s*/, "");
-      if (!text) continue;
-      const continuation = /^[a-z]|^(and|or|with|within|including|across|for)\b/i.test(text);
-      const previous = normalizedFacts[normalizedFacts.length - 1];
-      if (continuation && previous) {
-        previous.text = `${previous.text.replace(/[.,;:]?$/, ",")} ${text}`;
-        previous.sourceIndexes.push(index);
-      } else {
+      for (const text of splitIntoResumeBullets(rawText.replace(/^[•\-*]+\s*/, ""), 8)) {
         normalizedFacts.push({ text, sourceIndexes: [index] });
       }
     }
 
     const bullets: ResumeBullet[] = normalizedFacts
       .map(({ text, sourceIndexes }, index) => ({
-        text: text.slice(0, 360),
+        text: text.slice(0, 260),
         sourceFactIds: sourceIndexes.map((sourceIndex) => experienceBulletFactId(experience.id, sourceIndex)),
         origin: "user" as const,
         overlap: keywordOverlap(text, analysis.keywords),
@@ -205,7 +226,14 @@ function buildProjects(projects: Project[], analysis: JdAnalysis): TailoredResum
 }
 
 function buildEducation(educations: Education[]): TailoredResumeEducation[] {
+  const seen = new Set<string>();
   return [...educations]
+    .filter((education) => {
+      const key = `${education.institution}|${education.degree}|${education.graduationYear ?? ""}`.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
     .sort((a, b) => (b.graduationYear ?? 0) - (a.graduationYear ?? 0))
     .map((education) => ({
       institution: education.institution,
