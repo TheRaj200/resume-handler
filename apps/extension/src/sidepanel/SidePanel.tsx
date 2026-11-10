@@ -245,7 +245,7 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
         </div>
         <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
           <div
-            className="h-full rounded-full bg-brand-500/150/150 transition-all"
+            className="h-full rounded-full bg-brand-500 transition-all"
             style={{ width: `${completeness}%` }}
           />
         </div>
@@ -427,7 +427,7 @@ export function SidePanel() {
                 >
                   {tab.label}
                   {isActive ? (
-                    <span className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-brand-500/150/150" />
+                    <span className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-brand-500" />
                   ) : null}
                 </button>
               );

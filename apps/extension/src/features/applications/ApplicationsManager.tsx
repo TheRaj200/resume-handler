@@ -224,8 +224,8 @@ export function ApplicationsManager() {
           <p className="mt-0.5 text-base font-bold text-slate-100">{stats.total}</p>
         </Card>
         <Card className="p-2.5 text-center">
-          <p className="text-[10px] uppercase tracking-wide text-indigo-400">Applied</p>
-          <p className="mt-0.5 text-base font-bold text-indigo-300">{stats.applied}</p>
+          <p className="text-[10px] uppercase tracking-wide text-brand-400">Applied</p>
+          <p className="mt-0.5 text-base font-bold text-brand-300">{stats.applied}</p>
         </Card>
         <Card className="p-2.5 text-center">
           <p className="text-[10px] uppercase tracking-wide text-amber-400">Interviews</p>
@@ -285,7 +285,7 @@ export function ApplicationsManager() {
             onClick={() => setSelectedStatus("ALL")}
             className={`rounded-lg px-2.5 py-1 text-[11px] font-medium transition ${
               selectedStatus === "ALL"
-                ? "bg-brand-500/150/150/25 text-indigo-200"
+                ? "bg-brand-500/25 text-brand-200"
                 : "text-slate-400 hover:bg-white/[0.04]"
             }`}
           >
@@ -300,7 +300,7 @@ export function ApplicationsManager() {
                 onClick={() => setSelectedStatus(status)}
                 className={`shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-medium transition ${
                   selectedStatus === status
-                    ? "bg-brand-500/150/150/25 text-indigo-200"
+                    ? "bg-brand-500/25 text-brand-200"
                     : "text-slate-400 hover:bg-white/[0.04]"
                 }`}
               >
@@ -339,7 +339,7 @@ export function ApplicationsManager() {
                             href={app.jobUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[10px] text-indigo-400 hover:text-indigo-300 underline"
+                            className="text-[10px] text-brand-400 hover:text-brand-300 underline"
                           >
                             Job Link
                           </a>
@@ -385,7 +385,7 @@ export function ApplicationsManager() {
                   {/* Expand/Collapse details */}
                   <div className="flex items-center justify-between border-t border-white/5 pt-2 text-[11px]">
                     <button
-                      className="text-indigo-400 hover:text-indigo-300"
+                      className="text-brand-400 hover:text-brand-300"
                       onClick={() => setExpandedId(isExpanded ? null : app.id)}
                     >
                       {isExpanded ? "Hide Details" : "View Details & History"}
@@ -445,7 +445,7 @@ export function ApplicationsManager() {
                       {/* Timeline Events */}
                       <div>
                         <p className="text-slate-400 font-medium mb-1.5">Timeline History:</p>
-                        <div className="space-y-1.5 border-l-2 border-indigo-500/30 pl-2.5">
+                        <div className="space-y-1.5 border-l-2 border-brand-500/30 pl-2.5">
                           {app.events && app.events.length > 0 ? (
                             app.events.map((ev, index) => (
                               <div key={index} className="text-[11px]">
@@ -566,7 +566,7 @@ export function ApplicationsManager() {
             </h3>
             <p className="text-xs text-slate-400">
               Changing from <span className="font-semibold text-slate-200">{STATUS_LABELS[statusModalApp.status]}</span> to{" "}
-              <span className="font-semibold text-indigo-300">{STATUS_LABELS[targetStatus]}</span>.
+              <span className="font-semibold text-brand-300">{STATUS_LABELS[targetStatus]}</span>.
             </p>
 
             <Field label="Timeline Note (Optional)">

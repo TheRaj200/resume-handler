@@ -2,11 +2,14 @@
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --color-brand-300: #aab3ff;
-  --color-brand-400: #8f9bff;
-  --color-brand-500: #7b86ff;
-  --color-brand-600: #6876f5;
-  --color-brand-700: #5762dd;
+  --color-brand-200: #f7d794;
+  --color-brand-300: #fba17e;
+  --color-brand-400: #ff9a00;
+  --color-brand-500: #ee6200;
+  --color-brand-600: #d85700;
+  --color-brand-700: #b84a00;
+  --color-brand-800: #8f3a00;
+  --color-brand-900: #5c2600;
 }
 
 :root {
@@ -19,9 +22,10 @@
   --text-hi: #e9ecf6;
   --text-mid: #a7aec7;
   --text-low: #6d7591;
-  --accent: #7b86ff;
-  --accent-weak: rgba(123, 134, 255, 0.14);
-  --accent-ring: rgba(123, 134, 255, 0.35);
+  --accent: #ee6200;
+  --accent-weak: rgba(238, 98, 0, 0.14);
+  --accent-ring: rgba(255, 154, 0, 0.4);
+  --accent-text: #fba17e;
   --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
@@ -37,9 +41,9 @@ body {
 
 body {
   background:
-    radial-gradient(1100px 540px at 12% -8%, rgba(123, 134, 255, 0.22), transparent 55%),
-    radial-gradient(900px 520px at 112% 8%, rgba(139, 92, 246, 0.14), transparent 52%),
-    radial-gradient(720px 480px at 50% 112%, rgba(52, 211, 153, 0.1), transparent 55%),
+    radial-gradient(1100px 540px at 12% -8%, rgba(238, 98, 0, 0.22), transparent 55%),
+    radial-gradient(900px 520px at 112% 8%, rgba(255, 154, 0, 0.14), transparent 52%),
+    radial-gradient(720px 480px at 50% 112%, rgba(251, 161, 126, 0.1), transparent 55%),
     var(--bg);
   color: var(--text-hi);
   font-family: var(--font-sans);

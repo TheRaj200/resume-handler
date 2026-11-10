@@ -173,7 +173,7 @@ export function ExperienceSection() {
                     current: event.target.checked,
                   }))
                 }
-                className="h-4 w-4 rounded border-white/20 bg-slate-900 accent-indigo-500"
+                className="h-4 w-4 rounded border-white/20 bg-slate-900 accent-brand-500"
               />
               I currently work here
             </label>

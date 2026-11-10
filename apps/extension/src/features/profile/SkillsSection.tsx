@@ -165,7 +165,7 @@ export function SkillsSection() {
                 </p>
               </div>
               <button
-                className="text-[10px] text-indigo-300 hover:text-indigo-200"
+                className="text-[10px] text-brand-300 hover:text-brand-200"
                 onClick={() => {
                   setForm({
                     name: skill.name,

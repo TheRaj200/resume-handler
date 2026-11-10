@@ -81,14 +81,14 @@ function ResumePreview({ resume }: { resume: TailoredResume }) {
   return (
     <div className="mx-auto min-h-[842px] w-full max-w-[620px] rounded-lg bg-white px-9 py-9 text-slate-900 shadow-xl">
       <h1 className="text-[18px] font-bold leading-tight">{resume.contact.name}</h1>
-      <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-indigo-700">
+      <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-700">
         {resume.targetRole}
       </p>
       <p className="mt-1 flex flex-wrap gap-x-1 text-[8px] leading-relaxed text-slate-600">
         {contact.map((item, index) => (
           <span key={`${item.label}-${index}`}>
             {index > 0 ? " | " : ""}
-            {item.href ? <a className="text-indigo-700 underline" href={item.href}>{compactContact(item.label)}</a> : compactContact(item.label)}
+            {item.href ? <a className="text-brand-700 underline" href={item.href}>{compactContact(item.label)}</a> : compactContact(item.label)}
           </span>
         ))}
       </p>
@@ -147,7 +147,7 @@ function ResumePreview({ resume }: { resume: TailoredResume }) {
           {resume.projects.map((project, index) => (
             <div key={`${project.name}-${index}`} className="mt-1.5">
               <p className="text-[8.5px] font-bold">
-                {project.name}{project.url ? <> {" · "}<a className="font-normal text-indigo-700 underline" href={project.url}>Project link</a></> : null}
+                {project.name}{project.url ? <> {" · "}<a className="font-normal text-brand-700 underline" href={project.url}>Project link</a></> : null}
               </p>
               <p className="text-[7.5px] text-slate-600">{project.technologies.join(", ")}</p>
               <ul className="mt-1 space-y-0.5 text-[8px] leading-relaxed">
@@ -938,14 +938,14 @@ export function ResumeStudio() {
                       ×
                     </button>
                     <button
-                      className="text-slate-400 hover:text-indigo-300"
+                      className="text-slate-400 hover:text-brand-300"
                       onClick={() => moveSkill(index, -1)}
                       disabled={index === 0}
                     >
                       ↑
                     </button>
                     <button
-                      className="text-slate-400 hover:text-indigo-300"
+                      className="text-slate-400 hover:text-brand-300"
                       onClick={() => moveSkill(index, 1)}
                       disabled={index === resume.skills.length - 1}
                     >

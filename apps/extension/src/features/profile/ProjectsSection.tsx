@@ -178,7 +178,7 @@ export function ProjectsSection() {
                       {project.name}
                     </p>
                     {project.url ? (
-                      <p className="truncate text-[10px] text-indigo-300">{project.url}</p>
+                      <p className="truncate text-[10px] text-brand-300">{project.url}</p>
                     ) : null}
                   </div>
                   <div className="flex shrink-0 gap-1">

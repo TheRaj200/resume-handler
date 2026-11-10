@@ -58,7 +58,7 @@ function SectionCard({
         <label className="flex cursor-pointer items-start gap-2">
           <input
             type="checkbox"
-            className="mt-0.5 accent-indigo-500"
+            className="mt-0.5 accent-brand-500"
             checked={checked}
             onChange={(event) => onToggle(event.target.checked)}
           />
@@ -415,7 +415,7 @@ export function ResumeImportDialog({
               ) : null}
 
               {notice ? (
-                <p className="rounded-xl border border-indigo-400/20 bg-brand-500/150/150/10 px-3 py-2 text-[11px] text-indigo-200">
+                <p className="rounded-xl border border-brand-400/20 bg-brand-500/10 px-3 py-2 text-[11px] text-brand-200">
                   {notice}
                 </p>
               ) : null}

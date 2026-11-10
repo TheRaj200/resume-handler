@@ -6,7 +6,7 @@ export function Options() {
     <div className="mx-auto max-w-2xl px-6 py-10">
       <header className="mb-8 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-500/150/150 text-base font-bold text-white shadow-lg shadow-indigo-950/50">
+          <div className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-500 text-base font-bold text-white shadow-lg shadow-black/50">
             J
           </div>
           <div>

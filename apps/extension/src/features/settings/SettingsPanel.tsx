@@ -495,7 +495,7 @@ export function SettingsPanel() {
           Highlight matched fields
           <input
             type="checkbox"
-            className="accent-indigo-500"
+            className="accent-brand-500"
             checked={autofillPreferences.highlightMatches}
             onChange={(event) => setAutofillPreferences((previous) => ({ ...previous, highlightMatches: event.target.checked }))}
           />
@@ -504,7 +504,7 @@ export function SettingsPanel() {
           AI-assisted matching
           <input
             type="checkbox"
-            className="accent-indigo-500"
+            className="accent-brand-500"
             checked={autofillPreferences.aiMatching}
             onChange={(event) => setAutofillPreferences((previous) => ({ ...previous, aiMatching: event.target.checked }))}
           />
@@ -578,7 +578,7 @@ export function SettingsPanel() {
         <label className="flex items-center gap-2 text-[11px] text-slate-400">
           <input
             type="checkbox"
-            className="accent-indigo-500"
+            className="accent-brand-500"
             checked={rememberVaultUnlock}
             onChange={(event) => setRememberVaultUnlock(event.target.checked)}
           />
@@ -666,7 +666,7 @@ export function SettingsPanel() {
           </div>
           <input
             type="checkbox"
-            className="accent-indigo-500"
+            className="accent-brand-500"
             checked={syncSettings.enabled}
             onChange={(event) => setSyncSettings((previous) => ({ ...previous, enabled: event.target.checked }))}
           />
@@ -708,7 +708,7 @@ export function SettingsPanel() {
           </div>
         )}
         <Button type="button" variant="secondary" onClick={() => void saveSyncSettings(syncSettings)}>Save sync settings</Button>
-        {syncMessage ? <p className="rounded-xl border border-indigo-400/20 bg-brand-500/150/150/10 px-3 py-2 text-[11px] text-indigo-200">{syncMessage}</p> : null}
+        {syncMessage ? <p className="rounded-xl border border-brand-400/20 bg-brand-500/10 px-3 py-2 text-[11px] text-brand-200">{syncMessage}</p> : null}
         {conflicts && conflicts.length > 0 ? (
           <div className="space-y-2 rounded-xl border border-amber-400/20 bg-amber-500/10 p-3">
             <p className="text-xs font-semibold text-amber-700">Sync conflicts ({conflicts.length})</p>

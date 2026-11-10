@@ -45,9 +45,9 @@ export function FloatApp() {
   }, []);
 
   return (
-    <div className="flex h-screen flex-col bg-gradient-to-br from-indigo-950/40 via-slate-950 to-emerald-950/40">
+    <div className="flex h-screen flex-col bg-gradient-to-br from-brand-900/50 via-slate-950 to-brand-800/40">
       {/* Colored app bar */}
-      <header className="shrink-0 bg-gradient-to-r from-brand-600 via-brand-500 to-violet-500 px-5 py-3 text-white shadow-md">
+      <header className="shrink-0 bg-gradient-to-r from-brand-600 via-brand-500 to-brand-400 px-5 py-3 text-white shadow-md">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="grid h-9 w-9 place-items-center rounded-xl bg-white/20 text-sm font-bold backdrop-blur">
@@ -75,7 +75,7 @@ export function FloatApp() {
                 onClick={() => setActive(tab.id)}
                 className={`mb-1 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[12px] font-medium transition ${
                   isActive
-                    ? "bg-brand-500/150/150 text-white shadow-sm shadow-brand-500/30"
+                    ? "bg-brand-500 text-white shadow-sm shadow-brand-500/30"
                     : "text-slate-400 hover:bg-white/[0.08] hover:text-slate-200"
                 }`}
               >
@@ -110,7 +110,7 @@ function FloatDashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
           <p className="text-xs font-semibold uppercase tracking-wide text-brand-300">Autofill</p>
           <p className="mt-1 text-sm text-slate-300">Job forms bho aapke profile se automatically fill hote hain.</p>
         </div>
-        <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-white/[0.06] to-emerald-500/10 p-5 shadow-sm">
+        <div className="rounded-2xl border border-brand-500/30 bg-gradient-to-br from-white/[0.06] to-brand-500/10 p-5 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">Resume Studio</p>
           <p className="mt-1 text-sm text-slate-300">JD-tailored, fact-locked one-page resumes.</p>
         </div>
@@ -121,7 +121,7 @@ function FloatDashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => onNavigate("profile")}
-          className="rounded-xl bg-brand-500/150/150 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-brand-500/30 hover:bg-brand-600"
+          className="rounded-xl bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-brand-500/30 hover:bg-brand-600"
         >
           Edit profile
         </button>

@@ -36,7 +36,7 @@ function formatDate(value: string): string {
 }
 
 const uploadLabelClass =
-  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-500/150/150 px-3.5 py-2 text-sm font-medium text-white shadow-lg shadow-indigo-200 transition hover:bg-brand-400";
+  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-500 px-3.5 py-2 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-400";
 
 export function ResumeLibrary() {
   const resumes = useLiveQuery(() => db.resumes.toArray(), []);

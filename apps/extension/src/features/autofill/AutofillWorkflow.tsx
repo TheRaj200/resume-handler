@@ -639,7 +639,7 @@ export function AutofillWorkflow() {
                   type="checkbox"
                   checked={rememberMappings}
                   onChange={(event) => setRememberMappings(event.target.checked)}
-                  className="h-3.5 w-3.5 accent-indigo-500"
+                  className="h-3.5 w-3.5 accent-brand-500"
                 />
                 Remember mappings for {domain}
               </label>
@@ -649,7 +649,7 @@ export function AutofillWorkflow() {
                   checked={attachResume && Boolean(defaultResume)}
                   onChange={(event) => setAttachResume(event.target.checked)}
                   disabled={!defaultResume}
-                  className="h-3.5 w-3.5 accent-indigo-500"
+                  className="h-3.5 w-3.5 accent-brand-500"
                 />
                 Attach default resume
                 {defaultResume ? ` (${defaultResume.title})` : " (not set)"}
@@ -678,7 +678,7 @@ export function AutofillWorkflow() {
               </span>
             </div>
             {learnMessage ? (
-              <p className="rounded-xl border border-indigo-400/20 bg-brand-500/150/150/10 px-3 py-2 text-[11px] text-indigo-200">
+              <p className="rounded-xl border border-brand-400/20 bg-brand-500/10 px-3 py-2 text-[11px] text-brand-200">
                 {learnMessage}
               </p>
             ) : null}
@@ -714,7 +714,7 @@ export function AutofillWorkflow() {
                       <div className="flex min-w-0 items-start gap-2">
                         <input
                           type="checkbox"
-                          className="mt-1 h-3.5 w-3.5 accent-indigo-500"
+                          className="mt-1 h-3.5 w-3.5 accent-brand-500"
                           checked={row.selected}
                           disabled={!row.profileKey || row.value === null}
                           onChange={() => handleToggle(row.id)}
@@ -737,7 +737,7 @@ export function AutofillWorkflow() {
 
                     <div className="flex items-center gap-2">
                       <select
-                        className="w-44 shrink-0 rounded-lg border border-white/10 bg-slate-900/70 px-2 py-1.5 text-[11px] text-slate-100 outline-none focus:border-indigo-400/60"
+                        className="w-44 shrink-0 rounded-lg border border-white/10 bg-slate-900/70 px-2 py-1.5 text-[11px] text-slate-100 outline-none focus:border-brand-400/60"
                         value={row.profileKey}
                         disabled={isFileField}
                         onChange={(event) => handleProfileKeyChange(row.id, event.target.value)}
@@ -828,7 +828,7 @@ export function AutofillWorkflow() {
               ) : null}
 
               {trackedAppId ? (
-                <div className="mt-2 flex items-center justify-between rounded-xl border border-indigo-500/20 bg-brand-500/150/150/10 p-2.5">
+                <div className="mt-2 flex items-center justify-between rounded-xl border border-brand-500/20 bg-brand-500/10 p-2.5">
                   <div className="min-w-0 pr-2">
                     <p className="text-xs font-medium text-slate-200">Tracked in Applications</p>
                     <p className="text-[10px] text-slate-400">
