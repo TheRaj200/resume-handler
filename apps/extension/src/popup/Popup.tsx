@@ -81,8 +81,8 @@ export function Popup() {
             J
           </div>
           <div>
-            <p className="text-sm font-semibold tracking-tight text-slate-100">JobPilot AI</p>
-            <p className="text-[11px] text-slate-500">One profile · Tailored resumes</p>
+            <p className="text-sm font-semibold tracking-tight text-slate-800">JobPilot AI</p>
+            <p className="text-[11px] text-slate-400">One profile · Tailored resumes</p>
           </div>
         </div>
         <Badge tone="indigo">v0.1</Badge>
@@ -92,8 +92,8 @@ export function Popup() {
         <Card className="p-4">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-[0.14em] text-slate-500">Current page</p>
-              <p className="mt-1 truncate text-sm font-semibold text-slate-100">{heading}</p>
+              <p className="text-[10px] uppercase tracking-[0.14em] text-slate-400">Current page</p>
+              <p className="mt-1 truncate text-sm font-semibold text-slate-800">{heading}</p>
               <p className="mt-0.5 truncate text-xs text-slate-500">{subheading}</p>
             </div>
             {context?.hasJobPosting ? (
@@ -124,11 +124,11 @@ export function Popup() {
 
       <div className="mt-5">
         <div className="mb-2 flex items-center justify-between">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
             Recent applications
           </h2>
           <button
-            className="text-[11px] text-brand-300 hover:text-brand-200"
+            className="text-[11px] font-medium text-brand-600 hover:text-brand-700"
             onClick={() => void openPanel("applications")}
           >
             View all
@@ -145,10 +145,10 @@ export function Popup() {
             {recent.slice(0, 3).map((application) => (
               <li
                 key={application.id}
-                className="flex items-center justify-between gap-3 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2"
+                className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-xs font-medium text-slate-200">{application.jobTitle}</p>
+                  <p className="truncate text-xs font-medium text-slate-700">{application.jobTitle}</p>
                   <p className="truncate text-[11px] text-slate-500">{application.company}</p>
                 </div>
                 <Badge tone={statusTone(application.status)}>
@@ -161,12 +161,12 @@ export function Popup() {
       </div>
 
       {error ? (
-        <p className="mt-3 rounded-xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-[11px] text-rose-300">
+        <p className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-[11px] text-rose-600">
           {error}
         </p>
       ) : null}
 
-      <footer className="mt-auto pt-4 text-center text-[10px] text-slate-600">
+      <footer className="mt-auto pt-4 text-center text-[10px] text-slate-400">
         Local-first · BYOK · private
       </footer>
     </div>

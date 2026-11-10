@@ -322,7 +322,7 @@ export function SettingsPanel() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-semibold text-slate-100">AI Provider</h2>
+          <h2 className="text-sm font-semibold text-slate-800">AI Provider</h2>
           <p className="mt-0.5 text-xs text-slate-500">
             BYOK — key sirf tumhare browser me rahegi, backend ko kabhi nahi jayegi.
           </p>
@@ -413,9 +413,9 @@ export function SettingsPanel() {
           </Field>
         </div>
 
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2">
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
           <div>
-            <p className="text-xs font-medium text-slate-300">API endpoint access</p>
+            <p className="text-xs font-medium text-slate-500">API endpoint access</p>
             <p className="mt-0.5 text-[10px] text-slate-500">
               Direct browser-to-provider calls ke liye host permission.
             </p>
@@ -436,9 +436,9 @@ export function SettingsPanel() {
           )}
         </div>
 
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2">
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
           <div>
-            <p className="text-xs font-medium text-slate-300">Connection test</p>
+            <p className="text-xs font-medium text-slate-500">Connection test</p>
             <p className="mt-0.5 text-[10px] text-slate-500">
               API key se provider ka models endpoint check karega.
             </p>
@@ -453,7 +453,7 @@ export function SettingsPanel() {
           </Button>
         </div>
         {connectionMessage ? (
-          <p className={`rounded-xl border px-3 py-2 text-[11px] ${connectionState === "success" ? "border-emerald-400/20 bg-emerald-500/10 text-emerald-200" : "border-rose-400/20 bg-rose-500/10 text-rose-300"}`}>
+          <p className={`rounded-xl border px-3 py-2 text-[11px] ${connectionState === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-rose-200 bg-rose-50 text-rose-600"}`}>
             {connectionMessage}
           </p>
         ) : null}
@@ -462,7 +462,7 @@ export function SettingsPanel() {
       <Card className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-slate-100">Autofill preferences</h3>
+            <h3 className="text-sm font-semibold text-slate-800">Autofill preferences</h3>
             <p className="mt-0.5 text-[11px] text-slate-500">Scan/fill behavior customize karo.</p>
           </div>
           {preferencesStatus === "saved" ? <Badge tone="emerald">Saved</Badge> : null}
@@ -491,7 +491,7 @@ export function SettingsPanel() {
             />
           </Field>
         </div>
-        <label className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2 text-xs text-slate-300">
+        <label className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
           Highlight matched fields
           <input
             type="checkbox"
@@ -500,7 +500,7 @@ export function SettingsPanel() {
             onChange={(event) => setAutofillPreferences((previous) => ({ ...previous, highlightMatches: event.target.checked }))}
           />
         </label>
-        <label className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2 text-xs text-slate-300">
+        <label className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
           AI-assisted matching
           <input
             type="checkbox"
@@ -519,7 +519,7 @@ export function SettingsPanel() {
 
       <Card className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-slate-100">API Key Vault</h3>
+          <h3 className="text-sm font-semibold text-slate-800">API Key Vault</h3>
           <Badge
             tone={
               vaultState === "unlocked" ? "emerald" : vaultState === "locked" ? "amber" : "slate"
@@ -631,7 +631,7 @@ export function SettingsPanel() {
           ) : null}
         </div>
 
-        <p className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-[11px] leading-relaxed text-amber-200/80">
+        <p className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-[11px] leading-relaxed text-amber-700/80">
           Security note: key IndexedDB, logs ya backend me kabhi nahi jati. Sirf encrypted
           ciphertext chrome.storage.local me rehta hai; unlocked key memory me rehti hai aur 15
           minute inactivity ke baad auto-lock ho jati hai.
@@ -640,7 +640,7 @@ export function SettingsPanel() {
 
       <Card className="space-y-3">
         <div>
-          <h3 className="text-sm font-semibold text-slate-100">Data control & privacy</h3>
+          <h3 className="text-sm font-semibold text-slate-800">Data control & privacy</h3>
           <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
             Profile, resumes, generated versions and applications browser ke IndexedDB me rehte hain.
             AI calls direct provider ko jaati hain; backend ko API key nahi milti. Cloud sync abhi disabled hai.
@@ -659,7 +659,7 @@ export function SettingsPanel() {
       <Card className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-slate-100">Optional cloud sync</h3>
+            <h3 className="text-sm font-semibold text-slate-800">Optional cloud sync</h3>
             <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
               Default OFF. Local data primary rahega; sync enable karne par applications backend ke saath sync honge.
             </p>
@@ -699,7 +699,7 @@ export function SettingsPanel() {
             </div>
           </>
         ) : (
-          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-[11px] text-emerald-200">
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-[11px] text-emerald-700">
             <span>Connected as {syncUser}</span>
             <div className="flex gap-2">
               <Button type="button" variant="secondary" onClick={() => void handleSyncNow()} disabled={syncBusy || !syncSettings.enabled}>Sync now</Button>
@@ -708,12 +708,12 @@ export function SettingsPanel() {
           </div>
         )}
         <Button type="button" variant="secondary" onClick={() => void saveSyncSettings(syncSettings)}>Save sync settings</Button>
-        {syncMessage ? <p className="rounded-xl border border-indigo-400/20 bg-indigo-500/10 px-3 py-2 text-[11px] text-indigo-200">{syncMessage}</p> : null}
+        {syncMessage ? <p className="rounded-xl border border-indigo-400/20 bg-brand-500/10 px-3 py-2 text-[11px] text-indigo-700">{syncMessage}</p> : null}
         {conflicts && conflicts.length > 0 ? (
           <div className="space-y-2 rounded-xl border border-amber-400/20 bg-amber-500/10 p-3">
-            <p className="text-xs font-semibold text-amber-200">Sync conflicts ({conflicts.length})</p>
+            <p className="text-xs font-semibold text-amber-700">Sync conflicts ({conflicts.length})</p>
             {conflicts.map((conflict) => (
-              <div key={conflict.id} className="flex items-center justify-between gap-2 text-[11px] text-slate-300">
+              <div key={conflict.id} className="flex items-center justify-between gap-2 text-[11px] text-slate-500">
                 <span>{conflict.entity} · {conflict.entityId.slice(0, 8)}…</span>
                 <div className="flex gap-1">
                   <Button type="button" variant="ghost" className="px-2 py-1 text-[10px]" onClick={() => void resolveSyncConflict(conflict.id, "local")}>Keep local</Button>
@@ -726,7 +726,7 @@ export function SettingsPanel() {
       </Card>
 
       {error ? (
-        <p className="rounded-xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+        <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-600">
           {error}
         </p>
       ) : null}

@@ -79,7 +79,7 @@ function DragHandle({ onDragStart }: { onDragStart: () => void }) {
     <span
       role="button"
       aria-label="Drag to reorder"
-      className="drag-handle icon-press hidden h-6 w-6 shrink-0 place-items-center rounded-md text-slate-600 hover:bg-white/[0.06] hover:text-slate-300 sm:grid"
+      className="drag-handle icon-press hidden h-6 w-6 shrink-0 place-items-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-500 sm:grid"
       draggable
       onDragStart={onDragStart}
     >
@@ -120,17 +120,17 @@ function ChecklistItem({
         <span
           className={`grid h-4 w-4 place-items-center rounded-full border text-[10px] ${
             done
-              ? "border-emerald-400/40 bg-emerald-500/20 text-emerald-300"
-              : "border-white/15 text-slate-600"
+              ? "border-emerald-500 bg-emerald-500 text-white"
+              : "border-slate-300 text-slate-400"
           }`}
         >
           {done ? "✓" : ""}
         </span>
-        <span className={done ? "text-slate-400" : "text-slate-300"}>{label}</span>
+        <span className={done ? "text-slate-400" : "text-slate-500"}>{label}</span>
       </span>
       {!done ? (
         <button
-          className="text-[10px] text-indigo-300 hover:text-indigo-200"
+          className="text-[10px] font-medium text-brand-600 hover:text-brand-700"
           onClick={onAction}
         >
           Add
@@ -200,8 +200,8 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
       <Card className="p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-[0.14em] text-slate-500">Current page</p>
-            <p className="mt-1 truncate text-sm font-semibold text-slate-100">
+            <p className="text-[10px] uppercase tracking-[0.14em] text-slate-400">Current page</p>
+            <p className="mt-1 truncate text-sm font-semibold text-slate-800">
               {context?.jobTitle ?? context?.title ?? "No job page detected"}
             </p>
             <p className="mt-0.5 truncate text-xs text-slate-500">
@@ -227,9 +227,9 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
           { label: "Resumes", value: resumeCount },
           { label: "Profile", value: `${completeness}%` },
         ].map((stat) => (
-          <Card key={stat.label} className="p-3">
-            <p className="text-lg font-semibold text-slate-100">{stat.value}</p>
-            <p className="mt-0.5 text-[10px] uppercase tracking-wide text-slate-500">{stat.label}</p>
+          <Card key={stat.label} className="p-3 text-center">
+            <p className="text-lg font-semibold text-slate-800">{stat.value}</p>
+            <p className="mt-0.5 text-[10px] uppercase tracking-wide text-slate-400">{stat.label}</p>
           </Card>
         ))}
       </div>
@@ -237,12 +237,12 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
     checklist: () => (
       <Card className="p-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
             Setup checklist
           </h3>
-          <span className="text-xs font-semibold text-brand-300">{completeness}%</span>
+          <span className="text-xs font-semibold text-brand-600">{completeness}%</span>
         </div>
-        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
           <div
             className="h-full rounded-full bg-brand-500 transition-all"
             style={{ width: `${completeness}%` }}
@@ -274,10 +274,10 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
     ),
     phase2: () => (
       <Card className="p-4">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
           Phase 2 status
         </h3>
-        <ul className="mt-3 space-y-2 text-xs text-slate-400">
+        <ul className="mt-3 space-y-2 text-xs text-slate-500">
           <li className="flex items-center justify-between">
             <span>Form scanner</span>
             <Badge tone="emerald">Advanced</Badge>
@@ -310,7 +310,7 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
   return (
     <div>
       <div className="mb-2 flex items-center justify-end">
-        <span className="text-[10px] text-slate-600">Drag cards to reorder</span>
+        <span className="text-[10px] text-slate-400">Drag cards to reorder</span>
       </div>
       <div className="space-y-4">
         {order.map((id) => {
@@ -383,56 +383,58 @@ export function SidePanel() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-20 border-b border-white/[0.06] bg-[#0b0e14]/85 backdrop-blur-md">
-        <div className="flex items-center justify-between px-4 pt-3">
-          <div className="flex items-center gap-2.5">
-            <div className="grid h-8 w-8 place-items-center rounded-[10px] bg-gradient-to-br from-brand-400 to-brand-600 text-xs font-bold text-white shadow-sm shadow-brand-500/30">
-              J
+    <div className="flex min-h-screen flex-col bg-transparent">
+      <div className="mx-3 mt-3 mb-3 flex flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_8px_40px_rgba(23,28,48,0.08)]">
+        <header className="shrink-0 border-b border-slate-200 bg-gradient-to-b from-white to-slate-50">
+          <div className="flex items-center justify-between px-4 pt-3">
+            <div className="flex items-center gap-2.5">
+              <div className="grid h-8 w-8 place-items-center rounded-[10px] bg-gradient-to-br from-brand-400 to-brand-600 text-xs font-bold text-white shadow-sm shadow-brand-500/30">
+                J
+              </div>
+              <div>
+                <p className="text-sm font-semibold tracking-tight text-slate-800">JobPilot AI</p>
+                <p className="text-[10px] text-slate-400">One profile · Tailored resumes</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-semibold tracking-tight text-slate-100">JobPilot AI</p>
-              <p className="text-[10px] text-slate-500">One profile · Tailored resumes</p>
-            </div>
+            <Badge tone="indigo">v0.1</Badge>
           </div>
-          <Badge tone="indigo">v0.1</Badge>
-        </div>
 
-        <nav className="mt-2.5 flex gap-1 overflow-x-auto px-2 pb-2">
-          {TABS.map((tab) => {
-            const isActive = active === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActive(tab.id)}
-                className={`relative shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-medium transition ${
-                  isActive
-                    ? "bg-brand-500/15 text-brand-300"
-                    : "text-slate-500 hover:bg-white/[0.05] hover:text-slate-300"
-                }`}
-              >
-                {tab.label}
-                {isActive ? (
-                  <span className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-brand-400" />
-                ) : null}
-              </button>
-            );
-          })}
-        </nav>
-      </header>
+          <nav className="mt-2.5 flex gap-1 overflow-x-auto px-2 pb-2">
+            {TABS.map((tab) => {
+              const isActive = active === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActive(tab.id)}
+                  className={`relative shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-medium transition ${
+                    isActive
+                      ? "bg-brand-50 text-brand-700"
+                      : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                  }`}
+                >
+                  {tab.label}
+                  {isActive ? (
+                    <span className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-brand-500" />
+                  ) : null}
+                </button>
+              );
+            })}
+          </nav>
+        </header>
 
-      <main className="flex-1 px-4 py-4">
-        {active === "dashboard" ? <Dashboard onNavigate={(tab) => setActive(tab)} /> : null}
-        {active === "profile" ? <ProfileEditor /> : null}
-        {active === "resumes" ? <ResumeLibrary /> : null}
-        {active === "studio" ? <ResumeStudio /> : null}
-        {active === "applications" ? <ApplicationsManager /> : null}
-        {active === "settings" ? <SettingsPanel /> : null}
-      </main>
+        <main className="flex-1 overflow-y-auto px-4 py-4">
+          {active === "dashboard" ? <Dashboard onNavigate={(tab) => setActive(tab)} /> : null}
+          {active === "profile" ? <ProfileEditor /> : null}
+          {active === "resumes" ? <ResumeLibrary /> : null}
+          {active === "studio" ? <ResumeStudio /> : null}
+          {active === "applications" ? <ApplicationsManager /> : null}
+          {active === "settings" ? <SettingsPanel /> : null}
+        </main>
 
-      <footer className="border-t border-white/[0.06] px-4 py-2 text-center text-[10px] text-slate-600">
-        Data stays in your browser · BYOK
-      </footer>
+        <footer className="shrink-0 border-t border-slate-200 px-4 py-2 text-center text-[10px] text-slate-400">
+          Data stays in your browser · BYOK
+        </footer>
+      </div>
     </div>
   );
 }

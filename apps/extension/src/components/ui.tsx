@@ -11,8 +11,8 @@ export function Card({
 }) {
   return (
     <div
-      className={`relative rounded-xl border border-white/[0.07] bg-gradient-to-b from-white/[0.05] to-white/[0.02] shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset] ${
-        interactive ? "transition hover:border-white/[0.13] hover:from-white/[0.06]" : ""
+      className={`relative rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(23,28,48,0.04)] ${
+        interactive ? "transition hover:border-slate-300 hover:shadow-md" : ""
       } ${className}`}
     >
       {children}
@@ -35,12 +35,11 @@ export function Button({
   size?: ButtonSize;
 }) {
   const variants: Record<ButtonVariant, string> = {
-    primary:
-      "bg-brand-500 text-white shadow-sm shadow-brand-500/25 hover:bg-brand-400 active:bg-brand-600",
+    primary: "bg-brand-500 text-white shadow-sm shadow-brand-500/20 hover:bg-brand-600 active:bg-brand-700",
     secondary:
-      "bg-white/[0.07] text-slate-100 border border-white/10 hover:bg-white/[0.10] hover:border-white/[0.16] active:bg-white/[0.14]",
-    ghost: "bg-transparent text-slate-300 hover:bg-white/[0.06] hover:text-slate-100",
-    danger: "bg-rose-500/90 text-white hover:bg-rose-500 active:bg-rose-600",
+      "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 active:bg-slate-100",
+    ghost: "bg-transparent text-slate-500 hover:bg-slate-100 hover:text-slate-700",
+    danger: "bg-rose-500 text-white hover:bg-rose-600 active:bg-rose-700",
   };
   const sizes: Record<ButtonSize, string> = {
     sm: "px-2.5 py-1.5 text-xs rounded-lg",
@@ -67,11 +66,11 @@ export function Badge({
   tone?: BadgeTone;
 }) {
   const tones: Record<BadgeTone, string> = {
-    indigo: "bg-brand-500/15 text-brand-300 border-brand-500/25",
-    emerald: "bg-emerald-500/15 text-emerald-300 border-emerald-400/25",
-    amber: "bg-amber-500/15 text-amber-300 border-amber-400/25",
-    rose: "bg-rose-500/15 text-rose-300 border-rose-400/25",
-    slate: "bg-white/[0.06] text-slate-300 border-white/10",
+    indigo: "bg-indigo-50 text-indigo-700 border-indigo-200",
+    emerald: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    amber: "bg-amber-50 text-amber-700 border-amber-200",
+    rose: "bg-rose-50 text-rose-700 border-rose-200",
+    slate: "bg-slate-100 text-slate-600 border-slate-200",
   };
 
   return (
@@ -94,15 +93,15 @@ export function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-xs font-medium text-slate-300">{label}</span>
+      <span className="mb-1.5 block text-xs font-medium text-slate-600">{label}</span>
       {children}
-      {hint ? <span className="mt-1 block text-[11px] text-slate-500">{hint}</span> : null}
+      {hint ? <span className="mt-1 block text-[11px] text-slate-400">{hint}</span> : null}
     </label>
   );
 }
 
 export const inputClass =
-  "w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 outline-none placeholder:text-slate-600 transition focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20";
+  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm outline-none placeholder:text-slate-400 transition focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/15";
 
 export function EmptyState({
   title,
@@ -114,8 +113,8 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-4 py-8 text-center">
-      <p className="text-sm font-medium text-slate-200">{title}</p>
+    <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center">
+      <p className="text-sm font-medium text-slate-700">{title}</p>
       <p className="mx-auto mt-1 max-w-xs text-xs leading-relaxed text-slate-500">{description}</p>
       {action ? <div className="mt-4">{action}</div> : null}
     </div>

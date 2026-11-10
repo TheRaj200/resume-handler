@@ -36,7 +36,7 @@ function formatDate(value: string): string {
 }
 
 const uploadLabelClass =
-  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-indigo-500 px-3.5 py-2 text-sm font-medium text-white shadow-lg shadow-indigo-950/40 transition hover:bg-indigo-400";
+  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-500 px-3.5 py-2 text-sm font-medium text-white shadow-lg shadow-indigo-200 transition hover:bg-brand-400";
 
 export function ResumeLibrary() {
   const resumes = useLiveQuery(() => db.resumes.toArray(), []);
@@ -110,13 +110,13 @@ export function ResumeLibrary() {
       </div>
 
       {error ? (
-        <p className="rounded-xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+        <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-600">
           {error}
         </p>
       ) : null}
 
       {notice ? (
-        <p className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
+        <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
           {notice}
         </p>
       ) : null}
@@ -147,7 +147,7 @@ export function ResumeLibrary() {
                 <Card className="space-y-2 p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-slate-100">
+                      <p className="truncate text-sm font-medium text-slate-800">
                         {resume.title}
                       </p>
                       <p className="mt-0.5 text-[10px] text-slate-500">
@@ -187,7 +187,7 @@ export function ResumeLibrary() {
         </ul>
       )}
 
-      <p className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2 text-[11px] leading-relaxed text-slate-500">
+      <p className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] leading-relaxed text-slate-500">
         Text extraction PDF.js / mammoth se browser me hoti hai — file kisi server par nahi
         jaati. Import approve karne se pehle har section review hota hai.
       </p>

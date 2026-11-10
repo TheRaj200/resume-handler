@@ -215,7 +215,7 @@ export function PersonalSection() {
       </Card>
 
       {error ? (
-        <p className="rounded-xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+        <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-600">
           {error}
         </p>
       ) : null}

@@ -590,13 +590,13 @@ export function AutofillWorkflow() {
       </div>
 
       {error ? (
-        <p className="rounded-xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+        <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-600">
           {error}
         </p>
       ) : null}
 
       {formChanged ? (
-        <p className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+        <p className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-xs text-amber-700">
           Form change detect hua hai. Latest fields ke liye Rescan karo.
         </p>
       ) : null}
@@ -614,7 +614,7 @@ export function AutofillWorkflow() {
       ) : (
         <>
           {duplicateApp ? (
-            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200 space-y-1">
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-700 space-y-1">
               <p className="font-semibold flex items-center gap-1.5">
                 <span>⚠️</span> Duplicate Application Detected
               </p>
@@ -634,7 +634,7 @@ export function AutofillWorkflow() {
             </div>
 
             <div className="flex flex-wrap gap-3 pt-1">
-              <label className="flex items-center gap-1.5 text-[11px] text-slate-300">
+              <label className="flex items-center gap-1.5 text-[11px] text-slate-500">
                 <input
                   type="checkbox"
                   checked={rememberMappings}
@@ -643,7 +643,7 @@ export function AutofillWorkflow() {
                 />
                 Remember mappings for {domain}
               </label>
-              <label className="flex items-center gap-1.5 text-[11px] text-slate-300">
+              <label className="flex items-center gap-1.5 text-[11px] text-slate-500">
                 <input
                   type="checkbox"
                   checked={attachResume && Boolean(defaultResume)}
@@ -678,20 +678,20 @@ export function AutofillWorkflow() {
               </span>
             </div>
             {learnMessage ? (
-              <p className="rounded-xl border border-indigo-400/20 bg-indigo-500/10 px-3 py-2 text-[11px] text-indigo-200">
+              <p className="rounded-xl border border-indigo-400/20 bg-brand-500/10 px-3 py-2 text-[11px] text-indigo-700">
                 {learnMessage}
               </p>
             ) : null}
 
             {crossOriginOrigins.length > 0 ? (
-              <p className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
+              <p className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-700">
                 Cross-origin iframe detected ({crossOriginOrigins.length}). Uske andar ke fields
                 scan nahi hue. Full cross-origin iframe support Phase 2.5 me aayega.
               </p>
             ) : null}
 
             {scanResult.possibleClosedShadowRoots ? (
-              <p className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
+              <p className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-700">
                 Possible closed shadow DOM detected. Uske andar ke fields support nahi hain.
               </p>
             ) : null}
@@ -720,7 +720,7 @@ export function AutofillWorkflow() {
                           onChange={() => handleToggle(row.id)}
                         />
                         <div className="min-w-0">
-                          <p className="truncate text-xs font-medium text-slate-200">
+                          <p className="truncate text-xs font-medium text-slate-700">
                             {row.field.label}
                           </p>
                           <p className="truncate text-[10px] text-slate-500">
@@ -737,7 +737,7 @@ export function AutofillWorkflow() {
 
                     <div className="flex items-center gap-2">
                       <select
-                        className="w-44 shrink-0 rounded-lg border border-white/10 bg-slate-950/50 px-2 py-1.5 text-[11px] text-slate-200 outline-none focus:border-indigo-400/60"
+                        className="w-44 shrink-0 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] text-slate-700 outline-none focus:border-indigo-400/60"
                         value={row.profileKey}
                         disabled={isFileField}
                         onChange={(event) => handleProfileKeyChange(row.id, event.target.value)}
@@ -767,7 +767,7 @@ export function AutofillWorkflow() {
 
           {blocked.length > 0 ? (
             <Card className="space-y-1 p-3">
-              <p className="text-[11px] font-semibold text-slate-300">Not fillable</p>
+              <p className="text-[11px] font-semibold text-slate-500">Not fillable</p>
               <ul className="space-y-1 text-[10px] text-slate-500">
                 {blocked.map((entry) => (
                   <li key={entry.field.elementId}>
@@ -801,7 +801,7 @@ export function AutofillWorkflow() {
           {report ? (
             <Card className="space-y-2 p-3">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold text-slate-200">Fill report</p>
+                <p className="text-xs font-semibold text-slate-700">Fill report</p>
                 <Button
                   variant="secondary"
                   onClick={() => void handleUndo()}
@@ -822,15 +822,15 @@ export function AutofillWorkflow() {
                 </p>
               ) : null}
               {report.failed.length > 0 ? (
-                <p className="text-[10px] text-rose-300">
+                <p className="text-[10px] text-rose-600">
                   Failed: {report.failed.map((id) => rowLabel(rows, id)).join(", ")}
                 </p>
               ) : null}
 
               {trackedAppId ? (
-                <div className="mt-2 flex items-center justify-between rounded-xl border border-indigo-500/20 bg-indigo-500/10 p-2.5">
+                <div className="mt-2 flex items-center justify-between rounded-xl border border-indigo-500/20 bg-brand-500/10 p-2.5">
                   <div className="min-w-0 pr-2">
-                    <p className="text-xs font-medium text-slate-200">Tracked in Applications</p>
+                    <p className="text-xs font-medium text-slate-700">Tracked in Applications</p>
                     <p className="text-[10px] text-slate-400">
                       {isMarkedApplied
                         ? "Status: APPLIED"
@@ -860,7 +860,7 @@ export function AutofillWorkflow() {
           ) : null}
 
           {undoStatus === "undone" ? (
-            <p className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-300">
+            <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-600">
               Fill undo ho gaya. Fields original values pe wapas aa gaye.
             </p>
           ) : null}

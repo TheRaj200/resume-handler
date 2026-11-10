@@ -146,7 +146,7 @@ export function ProjectsSection() {
             </Field>
 
             {error ? (
-              <p className="rounded-xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+              <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-600">
                 {error}
               </p>
             ) : null}
@@ -164,7 +164,7 @@ export function ProjectsSection() {
       ) : null}
 
       {(projects ?? []).length === 0 ? (
-        <p className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-3 py-6 text-center text-xs text-slate-500">
+        <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-6 text-center text-xs text-slate-500">
           No projects yet. Add 1–2 strong projects to stand out.
         </p>
       ) : (
@@ -174,11 +174,11 @@ export function ProjectsSection() {
               <Card className="space-y-2 p-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-slate-100">
+                    <p className="truncate text-sm font-medium text-slate-800">
                       {project.name}
                     </p>
                     {project.url ? (
-                      <p className="truncate text-[10px] text-indigo-300">{project.url}</p>
+                      <p className="truncate text-[10px] text-indigo-600">{project.url}</p>
                     ) : null}
                   </div>
                   <div className="flex shrink-0 gap-1">

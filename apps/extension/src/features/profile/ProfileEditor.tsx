@@ -29,16 +29,16 @@ export function ProfileEditor() {
       <div>
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-semibold text-slate-100">Master Profile</h2>
+            <h2 className="text-sm font-semibold text-slate-800">Master Profile</h2>
             <p className="mt-0.5 text-xs text-slate-500">
               Autofill aur resume generation isi data se hoga.
             </p>
           </div>
-          <span className="text-xs font-semibold text-indigo-300">{completeness}%</span>
+          <span className="text-xs font-semibold text-brand-600">{completeness}%</span>
         </div>
-        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
           <div
-            className="h-full rounded-full bg-indigo-500 transition-all"
+            className="h-full rounded-full bg-brand-500 transition-all"
             style={{ width: `${completeness}%` }}
           />
         </div>
@@ -51,8 +51,8 @@ export function ProfileEditor() {
             onClick={() => setActive(section.id)}
             className={`shrink-0 rounded-lg px-2.5 py-1.5 text-[11px] font-medium transition ${
               active === section.id
-                ? "bg-indigo-500/20 text-indigo-200"
-                : "text-slate-500 hover:bg-white/[0.05] hover:text-slate-300"
+                ? "bg-brand-50 text-brand-700"
+                : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
             }`}
           >
             {section.label}

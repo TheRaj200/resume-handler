@@ -128,7 +128,7 @@ export function SkillsSection() {
           </Field>
 
           {error ? (
-            <p className="rounded-xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+            <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-600">
               {error}
             </p>
           ) : null}
@@ -147,7 +147,7 @@ export function SkillsSection() {
       </Card>
 
       {sorted.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-3 py-6 text-center text-xs text-slate-500">
+        <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-6 text-center text-xs text-slate-500">
           No skills yet. Add languages, frameworks, databases and tools.
         </p>
       ) : (
@@ -155,17 +155,17 @@ export function SkillsSection() {
           {sorted.map((skill) => (
             <div
               key={skill.id}
-              className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-2.5 py-1.5"
+              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1.5"
             >
               <div>
-                <p className="text-xs font-medium text-slate-200">{skill.name}</p>
+                <p className="text-xs font-medium text-slate-700">{skill.name}</p>
                 <p className="text-[10px] text-slate-500">
                   {skill.category ?? "uncategorized"}
                   {skill.proficiency ? ` · ${skill.proficiency}` : ""}
                 </p>
               </div>
               <button
-                className="text-[10px] text-indigo-300 hover:text-indigo-200"
+                className="text-[10px] text-indigo-600 hover:text-indigo-700"
                 onClick={() => {
                   setForm({
                     name: skill.name,
@@ -179,7 +179,7 @@ export function SkillsSection() {
                 Edit
               </button>
               <button
-                className="text-[10px] text-rose-300 hover:text-rose-200"
+                className="text-[10px] text-rose-600 hover:text-rose-200"
                 onClick={() => void handleDelete(skill.id)}
               >
                 ×

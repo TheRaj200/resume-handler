@@ -53,7 +53,7 @@ function SectionCard({
   children: ReactNode;
 }) {
   return (
-    <section className="space-y-2 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+    <section className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
       <div className="flex items-start justify-between gap-2">
         <label className="flex cursor-pointer items-start gap-2">
           <input
@@ -63,7 +63,7 @@ function SectionCard({
             onChange={(event) => onToggle(event.target.checked)}
           />
           <span>
-            <span className="block text-xs font-semibold text-slate-200">{title}</span>
+            <span className="block text-xs font-semibold text-slate-700">{title}</span>
             <span className="block text-[11px] text-slate-500">{hint}</span>
           </span>
         </label>
@@ -75,7 +75,7 @@ function SectionCard({
 
 function EmptyLine({ children }: { children: ReactNode }) {
   return (
-    <p className="rounded-lg border border-dashed border-white/10 px-2.5 py-2 text-[11px] text-slate-500">
+    <p className="rounded-lg border border-dashed border-slate-200 px-2.5 py-2 text-[11px] text-slate-500">
       {children}
     </p>
   );
@@ -331,10 +331,10 @@ export function ResumeImportDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3">
-      <div className="flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-2xl">
-        <div className="flex items-start justify-between gap-3 border-b border-white/10 px-4 py-3">
+      <div className="flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-slate-900 shadow-2xl">
+        <div className="flex items-start justify-between gap-3 border-b border-slate-200 px-4 py-3">
           <div className="min-w-0">
-            <h3 className="truncate text-sm font-semibold text-slate-100">
+            <h3 className="truncate text-sm font-semibold text-slate-800">
               Import resume → profile
             </h3>
             <p className="mt-0.5 truncate text-[11px] text-slate-500">
@@ -349,7 +349,7 @@ export function ResumeImportDialog({
         <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3">
           {phase === "extracting" ? (
             <div className="space-y-2 py-8 text-center">
-              <p className="text-sm text-slate-300">Resume text nikal raha hoon…</p>
+              <p className="text-sm text-slate-500">Resume text nikal raha hoon…</p>
               <p className="text-[11px] text-slate-500">
                 PDF.js / mammoth local browser me hi chalte hain — file upload nahi hoti.
               </p>
@@ -358,7 +358,7 @@ export function ResumeImportDialog({
 
           {phase === "error" ? (
             <div className="space-y-3 py-6 text-center">
-              <p className="text-sm text-rose-300">{error}</p>
+              <p className="text-sm text-rose-600">{error}</p>
               <div className="flex justify-center gap-2">
                 <Button variant="secondary" onClick={() => void runExtraction()}>
                   Retry
@@ -372,7 +372,7 @@ export function ResumeImportDialog({
 
           {phase === "ready" && parsed ? (
             <>
-              <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/10 bg-slate-950/40 px-3 py-2">
+              <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white/40 px-3 py-2">
                 <div className="text-[11px] text-slate-400">
                   {extraction
                     ? `${extraction.text.length.toLocaleString()} characters${
@@ -400,14 +400,14 @@ export function ResumeImportDialog({
               </div>
 
               {!hasText ? (
-                <p className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
+                <p className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-700">
                   Is file se text nahi mila. Scanned/image-based PDF ho sakta hai — text-based
                   PDF ya DOCX upload karo, ya profile manually bharo.
                 </p>
               ) : null}
 
               {warnings.length > 0 ? (
-                <ul className="space-y-1 rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
+                <ul className="space-y-1 rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-700">
                   {warnings.map((warning, index) => (
                     <li key={`${warning}-${index}`}>• {warning}</li>
                   ))}
@@ -415,19 +415,19 @@ export function ResumeImportDialog({
               ) : null}
 
               {notice ? (
-                <p className="rounded-xl border border-indigo-400/20 bg-indigo-500/10 px-3 py-2 text-[11px] text-indigo-200">
+                <p className="rounded-xl border border-indigo-400/20 bg-brand-500/10 px-3 py-2 text-[11px] text-indigo-700">
                   {notice}
                 </p>
               ) : null}
 
               {error ? (
-                <p className="rounded-xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-[11px] text-rose-300">
+                <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-[11px] text-rose-600">
                   {error}
                 </p>
               ) : null}
 
               {showText ? (
-                <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded-xl border border-white/10 bg-slate-950/60 p-3 text-[10px] leading-relaxed text-slate-400">
+                <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded-xl border border-slate-200 bg-white p-3 text-[10px] leading-relaxed text-slate-400">
                   {extraction?.text.slice(0, PREVIEW_CHARS)}
                   {(extraction?.text.length ?? 0) > PREVIEW_CHARS
                     ? "\n\n… preview truncated"
@@ -552,11 +552,11 @@ export function ResumeImportDialog({
                     return (
                       <div
                         key={`${item.company}-${item.designation}-${index}`}
-                        className="space-y-1 rounded-lg border border-white/10 bg-slate-950/40 p-2.5"
+                        className="space-y-1 rounded-lg border border-slate-200 bg-white/40 p-2.5"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0">
-                            <p className="truncate text-xs font-medium text-slate-200">
+                            <p className="truncate text-xs font-medium text-slate-700">
                               {item.designation || "Unknown role"}
                             </p>
                             <p className="truncate text-[11px] text-slate-500">
@@ -608,10 +608,10 @@ export function ResumeImportDialog({
                     return (
                       <div
                         key={`${item.institution}-${item.degree}-${index}`}
-                        className="flex items-start justify-between gap-2 rounded-lg border border-white/10 bg-slate-950/40 p-2.5"
+                        className="flex items-start justify-between gap-2 rounded-lg border border-slate-200 bg-white/40 p-2.5"
                       >
                         <div className="min-w-0">
-                          <p className="truncate text-xs font-medium text-slate-200">
+                          <p className="truncate text-xs font-medium text-slate-700">
                             {item.degree || "Unknown degree"}
                           </p>
                           <p className="truncate text-[11px] text-slate-500">
@@ -653,14 +653,14 @@ export function ResumeImportDialog({
                           key={`${item.name}-${index}`}
                           className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${
                             duplicate
-                              ? "border-amber-400/20 bg-amber-500/10 text-amber-200"
-                              : "border-white/10 bg-white/[0.06] text-slate-300"
+                              ? "border-amber-400/20 bg-amber-500/10 text-amber-700"
+                              : "border-slate-200 bg-slate-100 text-slate-500"
                           }`}
                         >
                           {item.name}
                           <button
                             type="button"
-                            className="text-slate-500 hover:text-rose-300"
+                            className="text-slate-500 hover:text-rose-600"
                             onClick={() => removeSkill(index)}
                             aria-label={`Remove ${item.name}`}
                           >
@@ -708,11 +708,11 @@ export function ResumeImportDialog({
                     return (
                       <div
                         key={`${item.name}-${index}`}
-                        className="space-y-1 rounded-lg border border-white/10 bg-slate-950/40 p-2.5"
+                        className="space-y-1 rounded-lg border border-slate-200 bg-white/40 p-2.5"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0">
-                            <p className="truncate text-xs font-medium text-slate-200">
+                            <p className="truncate text-xs font-medium text-slate-700">
                               {item.name}
                             </p>
                             {item.technologies.length > 0 ? (
@@ -739,7 +739,7 @@ export function ResumeImportDialog({
                 )}
               </SectionCard>
 
-              <label className="flex cursor-pointer items-start gap-2 rounded-xl border border-white/10 bg-slate-950/40 px-3 py-2">
+              <label className="flex cursor-pointer items-start gap-2 rounded-xl border border-slate-200 bg-white/40 px-3 py-2">
                 <input
                   type="checkbox"
                   className="mt-0.5 accent-rose-500"
@@ -749,7 +749,7 @@ export function ResumeImportDialog({
                   }
                 />
                 <span>
-                  <span className="block text-[11px] font-medium text-slate-300">
+                  <span className="block text-[11px] font-medium text-slate-500">
                     Replace existing data (destructive)
                   </span>
                   <span className="block text-[11px] text-slate-500">
@@ -762,7 +762,7 @@ export function ResumeImportDialog({
         </div>
 
         {phase === "ready" && parsed ? (
-          <div className="flex items-center justify-between gap-2 border-t border-white/10 px-4 py-3">
+          <div className="flex items-center justify-between gap-2 border-t border-slate-200 px-4 py-3">
             <p className="text-[11px] text-slate-500">
               {totalSelected} item(s) selected · approve ke baad hi profile update hoga
             </p>

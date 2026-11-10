@@ -221,11 +221,11 @@ export function ApplicationsManager() {
       <div className="grid grid-cols-4 gap-2">
         <Card className="p-2.5 text-center">
           <p className="text-[10px] uppercase tracking-wide text-slate-500">Total</p>
-          <p className="mt-0.5 text-base font-bold text-slate-100">{stats.total}</p>
+          <p className="mt-0.5 text-base font-bold text-slate-800">{stats.total}</p>
         </Card>
         <Card className="p-2.5 text-center">
           <p className="text-[10px] uppercase tracking-wide text-indigo-400">Applied</p>
-          <p className="mt-0.5 text-base font-bold text-indigo-300">{stats.applied}</p>
+          <p className="mt-0.5 text-base font-bold text-indigo-600">{stats.applied}</p>
         </Card>
         <Card className="p-2.5 text-center">
           <p className="text-[10px] uppercase tracking-wide text-amber-400">Interviews</p>
@@ -233,7 +233,7 @@ export function ApplicationsManager() {
         </Card>
         <Card className="p-2.5 text-center">
           <p className="text-[10px] uppercase tracking-wide text-emerald-400">Offers</p>
-          <p className="mt-0.5 text-base font-bold text-emerald-300">{stats.offers}</p>
+          <p className="mt-0.5 text-base font-bold text-emerald-600">{stats.offers}</p>
         </Card>
       </div>
 
@@ -265,7 +265,7 @@ export function ApplicationsManager() {
       </div>
 
       {error ? (
-        <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+        <div className="rounded-xl border border-rose-500/20 bg-rose-50 px-3 py-2 text-xs text-rose-600">
           {error}
         </div>
       ) : null}
@@ -285,8 +285,8 @@ export function ApplicationsManager() {
             onClick={() => setSelectedStatus("ALL")}
             className={`rounded-lg px-2.5 py-1 text-[11px] font-medium transition ${
               selectedStatus === "ALL"
-                ? "bg-indigo-500/25 text-indigo-200"
-                : "text-slate-400 hover:bg-white/[0.04]"
+                ? "bg-brand-500/25 text-indigo-700"
+                : "text-slate-400 hover:bg-slate-50"
             }`}
           >
             All ({activeApplications.length})
@@ -300,8 +300,8 @@ export function ApplicationsManager() {
                 onClick={() => setSelectedStatus(status)}
                 className={`shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-medium transition ${
                   selectedStatus === status
-                    ? "bg-indigo-500/25 text-indigo-200"
-                    : "text-slate-400 hover:bg-white/[0.04]"
+                    ? "bg-brand-500/25 text-indigo-700"
+                    : "text-slate-400 hover:bg-slate-50"
                 }`}
               >
                 {STATUS_LABELS[status]} ({count})
@@ -331,7 +331,7 @@ export function ApplicationsManager() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="truncate text-sm font-semibold text-slate-100">
+                        <p className="truncate text-sm font-semibold text-slate-800">
                           {app.company}
                         </p>
                         {app.jobUrl ? (
@@ -339,13 +339,13 @@ export function ApplicationsManager() {
                             href={app.jobUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[10px] text-indigo-400 hover:text-indigo-300 underline"
+                            className="text-[10px] text-indigo-400 hover:text-indigo-600 underline"
                           >
                             Job Link
                           </a>
                         ) : null}
                       </div>
-                      <p className="truncate text-xs text-slate-300">{app.jobTitle}</p>
+                      <p className="truncate text-xs text-slate-500">{app.jobTitle}</p>
                       <p className="mt-0.5 text-[10px] text-slate-500">
                         {app.appliedAt
                           ? `Applied: ${formatDate(app.appliedAt)}`
@@ -361,7 +361,7 @@ export function ApplicationsManager() {
                       {/* Status Transition Shortcut */}
                       <select
                         aria-label="Change status"
-                        className="rounded border border-white/10 bg-slate-900 px-1.5 py-0.5 text-[10px] text-slate-300 outline-none"
+                        className="rounded border border-slate-200 bg-slate-900 px-1.5 py-0.5 text-[10px] text-slate-500 outline-none"
                         value={app.status}
                         onChange={(event) =>
                           openStatusModal(app, event.target.value as ApplicationStatus)
@@ -377,7 +377,7 @@ export function ApplicationsManager() {
                   </div>
 
                   {app.notes ? (
-                    <p className="text-xs text-slate-400 italic bg-white/[0.02] p-1.5 rounded-lg border border-white/5">
+                    <p className="text-xs text-slate-400 italic bg-slate-50 p-1.5 rounded-lg border border-white/5">
                       "{app.notes}"
                     </p>
                   ) : null}
@@ -385,13 +385,13 @@ export function ApplicationsManager() {
                   {/* Expand/Collapse details */}
                   <div className="flex items-center justify-between border-t border-white/5 pt-2 text-[11px]">
                     <button
-                      className="text-indigo-400 hover:text-indigo-300"
+                      className="text-indigo-400 hover:text-indigo-600"
                       onClick={() => setExpandedId(isExpanded ? null : app.id)}
                     >
                       {isExpanded ? "Hide Details" : "View Details & History"}
                     </button>
                     <button
-                      className="text-rose-400 hover:text-rose-300"
+                      className="text-rose-400 hover:text-rose-600"
                       onClick={() => handleDelete(app.id)}
                     >
                       Delete
@@ -400,11 +400,11 @@ export function ApplicationsManager() {
 
                   {/* Expanded detail section */}
                    {isExpanded ? (
-                    <div className="space-y-3 pt-2 text-xs border-t border-white/10">
+                    <div className="space-y-3 pt-2 text-xs border-t border-slate-200">
                        {app.resumeVersionId ? (
                         <div>
                           <span className="text-slate-500 font-medium">Resume Version: </span>
-                          <span className="text-slate-300 font-mono text-[11px]">
+                          <span className="text-slate-500 font-mono text-[11px]">
                             {app.resumeVersionId}
                           </span>
                         </div>
@@ -427,8 +427,8 @@ export function ApplicationsManager() {
                            (version) => version.id === app.resumeVersionId,
                          );
                          return linked ? (
-                           <div className="rounded-lg border border-emerald-400/15 bg-emerald-500/5 p-2 text-[11px] text-slate-300">
-                             <span className="text-emerald-300">Linked:</span> v{linked.versionNumber} · {linked.content.targetRole} · {formatDate(linked.createdAt)}
+                           <div className="rounded-lg border border-emerald-400/15 bg-emerald-500/5 p-2 text-[11px] text-slate-500">
+                             <span className="text-emerald-600">Linked:</span> v{linked.versionNumber} · {linked.content.targetRole} · {formatDate(linked.createdAt)}
                            </div>
                          ) : null;
                        })() : null}
@@ -436,7 +436,7 @@ export function ApplicationsManager() {
                       {app.jdSnapshot ? (
                         <div>
                           <p className="text-slate-500 font-medium mb-1">JD Snapshot:</p>
-                          <div className="max-h-28 overflow-y-auto rounded bg-slate-950/60 p-2 text-[10px] text-slate-400 whitespace-pre-wrap">
+                          <div className="max-h-28 overflow-y-auto rounded bg-white p-2 text-[10px] text-slate-400 whitespace-pre-wrap">
                             {app.jdSnapshot}
                           </div>
                         </div>
@@ -463,7 +463,7 @@ export function ApplicationsManager() {
                               </div>
                             ))
                           ) : (
-                            <p className="text-[10px] text-slate-600">No events recorded.</p>
+                            <p className="text-[10px] text-slate-500">No events recorded.</p>
                           )}
                         </div>
                       </div>
@@ -479,8 +479,8 @@ export function ApplicationsManager() {
       {/* Add Application Modal */}
       {showAddModal ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-slate-900 p-4 shadow-2xl space-y-3">
-            <h3 className="text-sm font-semibold text-slate-100">Add Job Application</h3>
+          <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-slate-900 p-4 shadow-2xl space-y-3">
+            <h3 className="text-sm font-semibold text-slate-800">Add Job Application</h3>
             <form onSubmit={handleCreateApplication} className="space-y-2.5">
               <Field label="Company *">
                 <input
@@ -560,13 +560,13 @@ export function ApplicationsManager() {
       {/* Status Update Note Modal */}
       {statusModalApp ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-slate-900 p-4 shadow-2xl space-y-3">
-            <h3 className="text-sm font-semibold text-slate-100">
+          <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-slate-900 p-4 shadow-2xl space-y-3">
+            <h3 className="text-sm font-semibold text-slate-800">
               Update Status: {statusModalApp.company}
             </h3>
             <p className="text-xs text-slate-400">
-              Changing from <span className="font-semibold text-slate-200">{STATUS_LABELS[statusModalApp.status]}</span> to{" "}
-              <span className="font-semibold text-indigo-300">{STATUS_LABELS[targetStatus]}</span>.
+              Changing from <span className="font-semibold text-slate-700">{STATUS_LABELS[statusModalApp.status]}</span> to{" "}
+              <span className="font-semibold text-indigo-600">{STATUS_LABELS[targetStatus]}</span>.
             </p>
 
             <Field label="Timeline Note (Optional)">
@@ -601,8 +601,8 @@ export function ApplicationsManager() {
 
       {linkModalApp ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-sm space-y-3 rounded-2xl border border-white/10 bg-slate-900 p-4 shadow-2xl">
-            <h3 className="text-sm font-semibold text-slate-100">Link generated resume</h3>
+          <div className="w-full max-w-sm space-y-3 rounded-2xl border border-slate-200 bg-slate-900 p-4 shadow-2xl">
+            <h3 className="text-sm font-semibold text-slate-800">Link generated resume</h3>
             <p className="text-xs text-slate-400">
               {linkModalApp.company} · {linkModalApp.jobTitle}
             </p>
