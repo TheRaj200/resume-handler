@@ -11,7 +11,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`relative rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(23,28,48,0.04)] ${
+      className={`relative rounded-xl border border-slate-200 bg-gradient-to-b from-white to-indigo-50/40 shadow-[0_1px_2px_rgba(23,28,48,0.04)] ${
         interactive ? "transition hover:border-slate-300 hover:shadow-md" : ""
       } ${className}`}
     >

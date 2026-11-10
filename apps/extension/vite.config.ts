@@ -22,6 +22,7 @@ export default defineConfig({
         popup: r("popup.html"),
         sidepanel: r("sidepanel.html"),
         options: r("options.html"),
+        float: r("float.html"),
         background: r("src/background/service-worker.ts"),
       },
       output: {

@@ -8,6 +8,7 @@ import {
 } from "@jobpilot/shared";
 import { getRecentApplications } from "../db";
 import { getActiveTab, getPageContext, isInjectableUrl } from "../lib/content-script";
+import { openFloatingWindow } from "../lib/floating-window";
 import { Badge, Button, Card, EmptyState, type BadgeTone } from "../components/ui";
 
 type PanelTab = "dashboard" | "profile" | "resumes" | "applications" | "settings";
@@ -120,6 +121,9 @@ export function Popup() {
             Tracker
           </Button>
         </div>
+        <Button variant="secondary" className="w-full" onClick={() => void openFloatingWindow()}>
+          Open floating window
+        </Button>
       </div>
 
       <div className="mt-5">

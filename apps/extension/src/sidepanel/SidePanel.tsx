@@ -8,6 +8,7 @@ import {
 } from "@jobpilot/shared";
 import { countApplications, countResumes, db, getProfile } from "../db";
 import { extractJd, getActiveTab, getPageContext, isInjectableUrl } from "../lib/content-script";
+import { openFloatingWindow } from "../lib/floating-window";
 import { Badge, Button, Card, EmptyState, type BadgeTone } from "../components/ui";
 import { AutofillWorkflow } from "../features/autofill/AutofillWorkflow";
 import { ProfileEditor } from "../features/profile/ProfileEditor";
@@ -384,7 +385,7 @@ export function SidePanel() {
 
   return (
     <div className="flex min-h-screen flex-col bg-transparent">
-      <div className="mx-3 mt-3 mb-3 flex flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_8px_40px_rgba(23,28,48,0.08)]">
+      <div className="mx-3 mt-3 mb-3 flex flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-b from-white to-indigo-50/50 shadow-[0_8px_40px_rgba(23,28,48,0.10)]">
         <header className="shrink-0 border-b border-slate-200 bg-gradient-to-b from-white to-slate-50">
           <div className="flex items-center justify-between px-4 pt-3">
             <div className="flex items-center gap-2.5">
@@ -396,7 +397,19 @@ export function SidePanel() {
                 <p className="text-[10px] text-slate-400">One profile · Tailored resumes</p>
               </div>
             </div>
-            <Badge tone="indigo">v0.1</Badge>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => void openFloatingWindow()}
+                title="Open as floating window"
+                className="icon-press grid h-7 w-7 place-items-center rounded-lg border border-slate-200 bg-white text-slate-400 hover:text-brand-600"
+              >
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <rect x="2" y="3" width="12" height="9" rx="1.5" />
+                  <path d="M2 6h12" />
+                </svg>
+              </button>
+              <Badge tone="indigo">v0.1</Badge>
+            </div>
           </div>
 
           <nav className="mt-2.5 flex gap-1 overflow-x-auto px-2 pb-2">
