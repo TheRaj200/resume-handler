@@ -74,10 +74,10 @@ export function ProjectsSection() {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
             Projects
           </h3>
-          <p className="mt-0.5 text-[11px] text-slate-500">
+          <p className="mt-0.5 text-[11px] text-slate-400">
             {(projects ?? []).length} {(projects ?? []).length === 1 ? "project" : "projects"}
           </p>
         </div>
@@ -164,7 +164,7 @@ export function ProjectsSection() {
       ) : null}
 
       {(projects ?? []).length === 0 ? (
-        <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-6 text-center text-xs text-slate-500">
+        <p className="rounded-xl border border-dashed border-white/10 bg-white/[0.04] px-3 py-6 text-center text-xs text-slate-400">
           No projects yet. Add 1–2 strong projects to stand out.
         </p>
       ) : (
@@ -174,11 +174,11 @@ export function ProjectsSection() {
               <Card className="space-y-2 p-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-slate-800">
+                    <p className="truncate text-sm font-medium text-slate-100">
                       {project.name}
                     </p>
                     {project.url ? (
-                      <p className="truncate text-[10px] text-indigo-600">{project.url}</p>
+                      <p className="truncate text-[10px] text-indigo-300">{project.url}</p>
                     ) : null}
                   </div>
                   <div className="flex shrink-0 gap-1">
@@ -194,7 +194,7 @@ export function ProjectsSection() {
                   {project.description}
                 </p>
                 {project.technologies.length > 0 ? (
-                  <p className="text-[10px] text-slate-500">
+                  <p className="text-[10px] text-slate-400">
                     {project.technologies.join(" · ")}
                   </p>
                 ) : null}

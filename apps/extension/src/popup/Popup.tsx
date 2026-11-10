@@ -82,7 +82,7 @@ export function Popup() {
             J
           </div>
           <div>
-            <p className="text-sm font-semibold tracking-tight text-slate-800">JobPilot AI</p>
+            <p className="text-sm font-semibold tracking-tight text-slate-100">JobPilot AI</p>
             <p className="text-[11px] text-slate-400">One profile · Tailored resumes</p>
           </div>
         </div>
@@ -94,8 +94,8 @@ export function Popup() {
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="text-[10px] uppercase tracking-[0.14em] text-slate-400">Current page</p>
-              <p className="mt-1 truncate text-sm font-semibold text-slate-800">{heading}</p>
-              <p className="mt-0.5 truncate text-xs text-slate-500">{subheading}</p>
+              <p className="mt-1 truncate text-sm font-semibold text-slate-100">{heading}</p>
+              <p className="mt-0.5 truncate text-xs text-slate-400">{subheading}</p>
             </div>
             {context?.hasJobPosting ? (
               <Badge tone="emerald">JD detected</Badge>
@@ -132,7 +132,7 @@ export function Popup() {
             Recent applications
           </h2>
           <button
-            className="text-[11px] font-medium text-brand-600 hover:text-brand-700"
+            className="text-[11px] font-medium text-brand-300 hover:text-brand-200"
             onClick={() => void openPanel("applications")}
           >
             View all
@@ -149,11 +149,11 @@ export function Popup() {
             {recent.slice(0, 3).map((application) => (
               <li
                 key={application.id}
-                className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2"
+                className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-xs font-medium text-slate-700">{application.jobTitle}</p>
-                  <p className="truncate text-[11px] text-slate-500">{application.company}</p>
+                  <p className="truncate text-xs font-medium text-slate-200">{application.jobTitle}</p>
+                  <p className="truncate text-[11px] text-slate-400">{application.company}</p>
                 </div>
                 <Badge tone={statusTone(application.status)}>
                   {STATUS_LABELS[application.status]}

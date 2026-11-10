@@ -84,7 +84,7 @@ function ResumePreview({ resume }: { resume: TailoredResume }) {
       <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-indigo-700">
         {resume.targetRole}
       </p>
-      <p className="mt-1 flex flex-wrap gap-x-1 text-[8px] leading-relaxed text-slate-500">
+      <p className="mt-1 flex flex-wrap gap-x-1 text-[8px] leading-relaxed text-slate-600">
         {contact.map((item, index) => (
           <span key={`${item.label}-${index}`}>
             {index > 0 ? " | " : ""}
@@ -112,13 +112,13 @@ function ResumePreview({ resume }: { resume: TailoredResume }) {
               <p className="text-[8.5px] font-bold">
                 {experience.company} - {experience.designation}
               </p>
-              <p className="text-[7.5px] text-slate-500">
+              <p className="text-[7.5px] text-slate-600">
                 {[experience.startDate, experience.endDate ?? "Present"].filter(Boolean).join(" - ")}
               </p>
               <ul className="mt-0.5 space-y-0.5">
                 {experience.bullets.map((bullet, bulletIndex) => (
                   <li key={bulletIndex} className="flex gap-1 text-[8px] leading-relaxed">
-                    <span className="text-slate-500">-</span>
+                    <span className="text-slate-600">-</span>
                     <span>{bullet.text}</span>
                   </li>
                 ))}
@@ -149,11 +149,11 @@ function ResumePreview({ resume }: { resume: TailoredResume }) {
               <p className="text-[8.5px] font-bold">
                 {project.name}{project.url ? <> {" · "}<a className="font-normal text-indigo-700 underline" href={project.url}>Project link</a></> : null}
               </p>
-              <p className="text-[7.5px] text-slate-500">{project.technologies.join(", ")}</p>
+              <p className="text-[7.5px] text-slate-600">{project.technologies.join(", ")}</p>
               <ul className="mt-1 space-y-0.5 text-[8px] leading-relaxed">
                 {splitIntoResumeBullets(project.description, 4).map((bullet, bulletIndex) => (
                   <li key={bulletIndex} className="flex gap-1">
-                    <span className="text-slate-500">-</span>
+                    <span className="text-slate-600">-</span>
                     <span>{bullet}</span>
                   </li>
                 ))}
@@ -174,7 +174,7 @@ function ResumePreview({ resume }: { resume: TailoredResume }) {
                 {education.institution} - {education.degree}
                 {education.field ? `, ${education.field}` : ""}
               </p>
-              <p className="text-[7.5px] text-slate-500">
+              <p className="text-[7.5px] text-slate-600">
                 {[education.graduationYear?.toString(), education.grade].filter(Boolean).join(" | ")}
               </p>
             </div>
@@ -637,8 +637,8 @@ export function ResumeStudio() {
     <div className="space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold text-slate-800">Resume Studio</h2>
-          <p className="mt-0.5 text-[11px] text-slate-500">
+          <h2 className="text-sm font-semibold text-slate-100">Resume Studio</h2>
+          <p className="mt-0.5 text-[11px] text-slate-400">
             JD-tailored, fact-locked resume. AI sirf verified facts reorder/rephrase karta hai.
           </p>
         </div>
@@ -658,7 +658,7 @@ export function ResumeStudio() {
 
       <Card className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
             Job description
           </h3>
           <Button variant="secondary" onClick={() => void handleUsePageJd()}>
@@ -686,17 +686,17 @@ export function ResumeStudio() {
         </div>
 
         {analysis ? (
-          <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
+          <div className="space-y-2 rounded-xl border border-white/10 bg-white/[0.04] p-3">
             <div className="flex flex-wrap gap-1.5">
               {analysis.seniority ? <Badge tone="indigo">{analysis.seniority}</Badge> : null}
               {analysis.domain ? <Badge tone="emerald">{analysis.domain}</Badge> : null}
             </div>
             <p className="text-[11px] text-slate-400">
-              <span className="font-semibold text-slate-500">Keywords:</span>{" "}
+              <span className="font-semibold text-slate-400">Keywords:</span>{" "}
               {analysis.keywords.slice(0, 12).join(", ")}
             </p>
             <p className="text-[11px] text-slate-400">
-              <span className="font-semibold text-slate-500">Matched skills:</span>{" "}
+              <span className="font-semibold text-slate-400">Matched skills:</span>{" "}
               {analysis.requiredSkills.filter((skill) => !analysis.missingSkills.includes(skill)).join(", ") || "—"}
             </p>
             <p className="text-[11px] text-amber-700">
@@ -771,7 +771,7 @@ export function ResumeStudio() {
               </select>
             </Field>
           ) : (
-            <div className="flex items-end pb-2 text-[11px] text-slate-500">
+            <div className="flex items-end pb-2 text-[11px] text-slate-400">
               Master Profile facts use honge.
             </div>
           )}
@@ -784,7 +784,7 @@ export function ResumeStudio() {
         ) : null}
 
         {sourceOverride ? (
-          <p className="text-[11px] text-slate-500">
+          <p className="text-[11px] text-slate-400">
             <span className="text-emerald-600">Quick source active:</span>{" "}
             {sourceOverride.experiences.length} experience ·{" "}
             {sourceOverride.skills.length} skills · {sourceOverride.projects.length} projects
@@ -844,7 +844,7 @@ export function ResumeStudio() {
         <>
           <Card className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+              <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
                 Editor
               </h3>
               <Badge tone={resume.meta.factLockPassed ? "emerald" : "rose"}>
@@ -861,18 +861,18 @@ export function ResumeStudio() {
             </Field>
 
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-slate-500">Experience</p>
+              <p className="text-xs font-semibold text-slate-400">Experience</p>
               {resume.experience.map((experience, experienceIndex) => (
                 <div
                   key={`${experience.company}-${experienceIndex}`}
-                  className="rounded-xl border border-slate-200 bg-slate-50 p-3"
+                  className="rounded-xl border border-white/10 bg-white/[0.04] p-3"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <p className="text-xs font-medium text-slate-700">
+                      <p className="text-xs font-medium text-slate-200">
                         {experience.company} — {experience.designation}
                       </p>
-                      <p className="text-[10px] text-slate-500">
+                      <p className="text-[10px] text-slate-400">
                         {[experience.startDate, experience.endDate ?? "Present"]
                           .filter(Boolean)
                           .join(" - ")}
@@ -923,29 +923,29 @@ export function ResumeStudio() {
             </div>
 
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-slate-500">Skills</p>
+              <p className="text-xs font-semibold text-slate-400">Skills</p>
               <div className="flex flex-wrap gap-1.5">
                 {resume.skills.map((skill, index) => (
                   <span
                     key={`${skill.name}-${index}`}
-                    className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] text-slate-500"
+                    className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] text-slate-400"
                   >
                     {skill.name}
                     <button
-                      className="text-slate-500 hover:text-rose-600"
+                      className="text-slate-400 hover:text-rose-600"
                       onClick={() => removeSkill(index)}
                     >
                       ×
                     </button>
                     <button
-                      className="text-slate-500 hover:text-indigo-600"
+                      className="text-slate-400 hover:text-indigo-300"
                       onClick={() => moveSkill(index, -1)}
                       disabled={index === 0}
                     >
                       ↑
                     </button>
                     <button
-                      className="text-slate-500 hover:text-indigo-600"
+                      className="text-slate-400 hover:text-indigo-300"
                       onClick={() => moveSkill(index, 1)}
                       disabled={index === resume.skills.length - 1}
                     >
@@ -968,9 +968,9 @@ export function ResumeStudio() {
             </div>
 
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-slate-500">Projects & links</p>
+              <p className="text-xs font-semibold text-slate-400">Projects & links</p>
               {resume.projects.map((project, projectIndex) => (
-                <div key={`${project.name}-${projectIndex}`} className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <div key={`${project.name}-${projectIndex}`} className="space-y-2 rounded-xl border border-white/10 bg-white/[0.04] p-3">
                   <div className="grid gap-2 sm:grid-cols-2">
                     <Field label="Project name">
                       <input className={inputClass} value={project.name} onChange={(event) => updateProject(projectIndex, { name: event.target.value })} />
@@ -987,10 +987,10 @@ export function ResumeStudio() {
                   </Field>
                 </div>
               ))}
-              {resume.projects.length === 0 ? <p className="text-[11px] text-slate-500">No projects in this draft. Add project URLs in Profile → Projects, then regenerate.</p> : null}
+              {resume.projects.length === 0 ? <p className="text-[11px] text-slate-400">No projects in this draft. Add project URLs in Profile → Projects, then regenerate.</p> : null}
             </div>
 
-            <p className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] leading-relaxed text-slate-500">
+            <p className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-[11px] leading-relaxed text-slate-400">
               AI-generated bullets source fact IDs se locked hote hain. User-added bullets aur
               skills manually tumhari responsibility hain — inhe profile fact ke bina mat add karo.
             </p>
@@ -998,7 +998,7 @@ export function ResumeStudio() {
 
           <Card className="space-y-2">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+              <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
                 Live preview
               </h3>
               <Badge tone="slate">{templateId}</Badge>
@@ -1007,23 +1007,23 @@ export function ResumeStudio() {
           </Card>
 
           <Card className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
               Version history
             </h3>
             {!versions || versions.length === 0 ? (
-              <p className="text-[11px] text-slate-500">No versions saved yet.</p>
+              <p className="text-[11px] text-slate-400">No versions saved yet.</p>
             ) : (
               <ul className="space-y-1.5">
                 {versions.map((version) => (
                   <li
                     key={version.id}
-                    className="flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2"
+                    className="flex items-center justify-between gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-2"
                   >
                     <div className="min-w-0">
-                      <p className="truncate text-[11px] text-slate-500">
+                      <p className="truncate text-[11px] text-slate-400">
                         v{version.versionNumber} · {version.templateId} · {version.content.targetRole}
                       </p>
-                      <p className="text-[10px] text-slate-500">{formatDate(version.createdAt)}</p>
+                      <p className="text-[10px] text-slate-400">{formatDate(version.createdAt)}</p>
                     </div>
                      <div className="flex shrink-0 gap-1">
                        <Button variant="ghost" onClick={() => handleLoadVersion(version)}>Load</Button>

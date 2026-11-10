@@ -80,7 +80,7 @@ function DragHandle({ onDragStart }: { onDragStart: () => void }) {
     <span
       role="button"
       aria-label="Drag to reorder"
-      className="drag-handle icon-press hidden h-6 w-6 shrink-0 place-items-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-500 sm:grid"
+      className="drag-handle icon-press hidden h-6 w-6 shrink-0 place-items-center rounded-md text-slate-400 hover:bg-white/[0.08] hover:text-slate-400 sm:grid"
       draggable
       onDragStart={onDragStart}
     >
@@ -122,16 +122,16 @@ function ChecklistItem({
           className={`grid h-4 w-4 place-items-center rounded-full border text-[10px] ${
             done
               ? "border-emerald-500 bg-emerald-500 text-white"
-              : "border-slate-300 text-slate-400"
+              : "border-white/15 text-slate-400"
           }`}
         >
           {done ? "✓" : ""}
         </span>
-        <span className={done ? "text-slate-400" : "text-slate-500"}>{label}</span>
+        <span className={done ? "text-slate-400" : "text-slate-400"}>{label}</span>
       </span>
       {!done ? (
         <button
-          className="text-[10px] font-medium text-brand-600 hover:text-brand-700"
+          className="text-[10px] font-medium text-brand-300 hover:text-brand-200"
           onClick={onAction}
         >
           Add
@@ -202,10 +202,10 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-[10px] uppercase tracking-[0.14em] text-slate-400">Current page</p>
-            <p className="mt-1 truncate text-sm font-semibold text-slate-800">
+            <p className="mt-1 truncate text-sm font-semibold text-slate-100">
               {context?.jobTitle ?? context?.title ?? "No job page detected"}
             </p>
-            <p className="mt-0.5 truncate text-xs text-slate-500">
+            <p className="mt-0.5 truncate text-xs text-slate-400">
               {context?.company ?? context?.domain ?? "Open a job portal to begin"}
             </p>
           </div>
@@ -229,7 +229,7 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
           { label: "Profile", value: `${completeness}%` },
         ].map((stat) => (
           <Card key={stat.label} className="p-3 text-center">
-            <p className="text-lg font-semibold text-slate-800">{stat.value}</p>
+            <p className="text-lg font-semibold text-slate-100">{stat.value}</p>
             <p className="mt-0.5 text-[10px] uppercase tracking-wide text-slate-400">{stat.label}</p>
           </Card>
         ))}
@@ -241,11 +241,11 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
           <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
             Setup checklist
           </h3>
-          <span className="text-xs font-semibold text-brand-600">{completeness}%</span>
+          <span className="text-xs font-semibold text-brand-300">{completeness}%</span>
         </div>
-        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
           <div
-            className="h-full rounded-full bg-brand-500 transition-all"
+            className="h-full rounded-full bg-brand-500/150/150 transition-all"
             style={{ width: `${completeness}%` }}
           />
         </div>
@@ -278,7 +278,7 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
         <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
           Phase 2 status
         </h3>
-        <ul className="mt-3 space-y-2 text-xs text-slate-500">
+        <ul className="mt-3 space-y-2 text-xs text-slate-400">
           <li className="flex items-center justify-between">
             <span>Form scanner</span>
             <Badge tone="emerald">Advanced</Badge>
@@ -385,15 +385,15 @@ export function SidePanel() {
 
   return (
     <div className="flex min-h-screen flex-col bg-transparent">
-      <div className="mx-3 mt-3 mb-3 flex flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-b from-white to-indigo-50/50 shadow-[0_8px_40px_rgba(23,28,48,0.10)]">
-        <header className="shrink-0 border-b border-slate-200 bg-gradient-to-b from-white to-slate-50">
+      <div className="mx-3 mt-3 mb-3 flex flex-1 flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] shadow-[0_8px_40px_rgba(0,0,0,0.4)]">
+        <header className="shrink-0 border-b border-white/10 bg-gradient-to-b from-white/[0.05] to-transparent">
           <div className="flex items-center justify-between px-4 pt-3">
             <div className="flex items-center gap-2.5">
               <div className="grid h-8 w-8 place-items-center rounded-[10px] bg-gradient-to-br from-brand-400 to-brand-600 text-xs font-bold text-white shadow-sm shadow-brand-500/30">
                 J
               </div>
               <div>
-                <p className="text-sm font-semibold tracking-tight text-slate-800">JobPilot AI</p>
+                <p className="text-sm font-semibold tracking-tight text-slate-100">JobPilot AI</p>
                 <p className="text-[10px] text-slate-400">One profile · Tailored resumes</p>
               </div>
             </div>
@@ -401,7 +401,7 @@ export function SidePanel() {
               <button
                 onClick={() => void openFloatingWindow()}
                 title="Open as floating window"
-                className="icon-press grid h-7 w-7 place-items-center rounded-lg border border-slate-200 bg-white text-slate-400 hover:text-brand-600"
+                className="icon-press grid h-7 w-7 place-items-center rounded-lg border border-white/10 bg-white/[0.08] text-slate-300 hover:text-brand-300"
               >
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <rect x="2" y="3" width="12" height="9" rx="1.5" />
@@ -421,13 +421,13 @@ export function SidePanel() {
                   onClick={() => setActive(tab.id)}
                   className={`relative shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-medium transition ${
                     isActive
-                      ? "bg-brand-50 text-brand-700"
-                      : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                      ? "bg-brand-500/150/15 text-brand-200"
+                      : "text-slate-400 hover:bg-white/[0.08] hover:text-slate-200"
                   }`}
                 >
                   {tab.label}
                   {isActive ? (
-                    <span className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-brand-500" />
+                    <span className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-brand-500/150/150" />
                   ) : null}
                 </button>
               );
@@ -444,7 +444,7 @@ export function SidePanel() {
           {active === "settings" ? <SettingsPanel /> : null}
         </main>
 
-        <footer className="shrink-0 border-t border-slate-200 px-4 py-2 text-center text-[10px] text-slate-400">
+        <footer className="shrink-0 border-t border-white/10 px-4 py-2 text-center text-[10px] text-slate-400">
           Data stays in your browser · BYOK
         </footer>
       </div>

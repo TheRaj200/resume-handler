@@ -45,7 +45,7 @@ export function FloatApp() {
   }, []);
 
   return (
-    <div className="flex h-screen flex-col bg-gradient-to-br from-indigo-50/80 via-slate-50 to-emerald-50/60">
+    <div className="flex h-screen flex-col bg-gradient-to-br from-indigo-950/40 via-slate-950 to-emerald-950/40">
       {/* Colored app bar */}
       <header className="shrink-0 bg-gradient-to-r from-brand-600 via-brand-500 to-violet-500 px-5 py-3 text-white shadow-md">
         <div className="flex items-center justify-between">
@@ -66,7 +66,7 @@ export function FloatApp() {
 
       <div className="flex min-h-0 flex-1">
         {/* Left navigation */}
-        <nav className="w-44 shrink-0 border-r border-slate-200 bg-white/70 px-2 py-3 backdrop-blur">
+        <nav className="w-44 shrink-0 border-r border-white/10 bg-slate-950/40 px-2 py-3 backdrop-blur">
           {TABS.map((tab) => {
             const isActive = active === tab.id;
             return (
@@ -75,15 +75,15 @@ export function FloatApp() {
                 onClick={() => setActive(tab.id)}
                 className={`mb-1 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[12px] font-medium transition ${
                   isActive
-                    ? "bg-brand-500 text-white shadow-sm shadow-brand-500/30"
-                    : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                    ? "bg-brand-500/150/150 text-white shadow-sm shadow-brand-500/30"
+                    : "text-slate-400 hover:bg-white/[0.08] hover:text-slate-200"
                 }`}
               >
                 {tab.label}
               </button>
             );
           })}
-          <div className="mt-4 border-t border-slate-200 pt-3">
+          <div className="mt-4 border-t border-white/10 pt-3">
             <p className="px-3 text-[10px] uppercase tracking-wide text-slate-400">Local · BYOK</p>
           </div>
         </nav>
@@ -106,13 +106,13 @@ function FloatDashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-2xl border border-brand-200/60 bg-gradient-to-br from-white to-indigo-50 p-5 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">Autofill</p>
-          <p className="mt-1 text-sm text-slate-600">Job forms bho aapke profile se automatically fill hote hain.</p>
+        <div className="rounded-2xl border border-brand-500/30 bg-gradient-to-br from-white/[0.06] to-brand-500/10 p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-brand-300">Autofill</p>
+          <p className="mt-1 text-sm text-slate-300">Job forms bho aapke profile se automatically fill hote hain.</p>
         </div>
-        <div className="rounded-2xl border border-emerald-200/60 bg-gradient-to-br from-white to-emerald-50 p-5 shadow-sm">
+        <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-white/[0.06] to-emerald-500/10 p-5 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">Resume Studio</p>
-          <p className="mt-1 text-sm text-slate-600">JD-tailored, fact-locked one-page resumes.</p>
+          <p className="mt-1 text-sm text-slate-300">JD-tailored, fact-locked one-page resumes.</p>
         </div>
       </div>
 
@@ -121,13 +121,13 @@ function FloatDashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => onNavigate("profile")}
-          className="rounded-xl bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-brand-500/30 hover:bg-brand-600"
+          className="rounded-xl bg-brand-500/150/150 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-brand-500/30 hover:bg-brand-600"
         >
           Edit profile
         </button>
         <button
           onClick={() => onNavigate("studio")}
-          className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="rounded-xl border border-white/10 bg-white/[0.07] px-4 py-2 text-sm font-medium text-slate-100 hover:bg-white/[0.12]"
         >
           Open Resume Studio
         </button>

@@ -64,10 +64,10 @@ export function SkillsSection() {
   return (
     <div className="space-y-3">
       <div>
-        <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
           Skills
         </h3>
-        <p className="mt-0.5 text-[11px] text-slate-500">
+        <p className="mt-0.5 text-[11px] text-slate-400">
           {sorted.length} {sorted.length === 1 ? "skill" : "skills"}
         </p>
       </div>
@@ -147,7 +147,7 @@ export function SkillsSection() {
       </Card>
 
       {sorted.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-6 text-center text-xs text-slate-500">
+        <p className="rounded-xl border border-dashed border-white/10 bg-white/[0.04] px-3 py-6 text-center text-xs text-slate-400">
           No skills yet. Add languages, frameworks, databases and tools.
         </p>
       ) : (
@@ -155,17 +155,17 @@ export function SkillsSection() {
           {sorted.map((skill) => (
             <div
               key={skill.id}
-              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1.5"
+              className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-2.5 py-1.5"
             >
               <div>
-                <p className="text-xs font-medium text-slate-700">{skill.name}</p>
-                <p className="text-[10px] text-slate-500">
+                <p className="text-xs font-medium text-slate-200">{skill.name}</p>
+                <p className="text-[10px] text-slate-400">
                   {skill.category ?? "uncategorized"}
                   {skill.proficiency ? ` · ${skill.proficiency}` : ""}
                 </p>
               </div>
               <button
-                className="text-[10px] text-indigo-600 hover:text-indigo-700"
+                className="text-[10px] text-indigo-300 hover:text-indigo-200"
                 onClick={() => {
                   setForm({
                     name: skill.name,

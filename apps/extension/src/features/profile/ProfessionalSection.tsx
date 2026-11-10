@@ -86,7 +86,7 @@ export function ProfessionalSection() {
     <form onSubmit={handleSubmit} className="space-y-3">
       <Card className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
             Professional summary
           </h3>
           {status === "saved" ? <Badge tone="emerald">Saved</Badge> : null}
@@ -113,7 +113,7 @@ export function ProfessionalSection() {
       </Card>
 
       <Card className="space-y-3">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
           Links
         </h3>
 
@@ -154,7 +154,7 @@ export function ProfessionalSection() {
       </Card>
 
       <Card className="space-y-3">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
           Job preferences
         </h3>
 

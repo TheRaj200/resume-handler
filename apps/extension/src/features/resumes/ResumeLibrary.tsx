@@ -36,7 +36,7 @@ function formatDate(value: string): string {
 }
 
 const uploadLabelClass =
-  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-500 px-3.5 py-2 text-sm font-medium text-white shadow-lg shadow-indigo-200 transition hover:bg-brand-400";
+  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-500/150/150 px-3.5 py-2 text-sm font-medium text-white shadow-lg shadow-indigo-200 transition hover:bg-brand-400";
 
 export function ResumeLibrary() {
   const resumes = useLiveQuery(() => db.resumes.toArray(), []);
@@ -90,10 +90,10 @@ export function ResumeLibrary() {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
             Resume library
           </h3>
-          <p className="mt-0.5 text-[11px] text-slate-500">
+          <p className="mt-0.5 text-[11px] text-slate-400">
             PDF / DOC / DOCX · max {formatBytes(MAX_RESUME_BYTES)} · stored locally
           </p>
         </div>
@@ -147,10 +147,10 @@ export function ResumeLibrary() {
                 <Card className="space-y-2 p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-slate-800">
+                      <p className="truncate text-sm font-medium text-slate-100">
                         {resume.title}
                       </p>
-                      <p className="mt-0.5 text-[10px] text-slate-500">
+                      <p className="mt-0.5 text-[10px] text-slate-400">
                         Added {formatDate(resume.createdAt)}
                         {resume.parsedAt ? ` · Imported ${formatDate(resume.parsedAt)}` : ""}
                       </p>
@@ -187,7 +187,7 @@ export function ResumeLibrary() {
         </ul>
       )}
 
-      <p className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] leading-relaxed text-slate-500">
+      <p className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-[11px] leading-relaxed text-slate-400">
         Text extraction PDF.js / mammoth se browser me hoti hai — file kisi server par nahi
         jaati. Import approve karne se pehle har section review hota hai.
       </p>

@@ -2,27 +2,27 @@
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --color-brand-300: #8f9bff;
-  --color-brand-400: #6f7cff;
-  --color-brand-500: #5b68f0;
-  --color-brand-600: #4b54d6;
-  --color-brand-700: #3d45b5;
+  --color-brand-300: #aab3ff;
+  --color-brand-400: #8f9bff;
+  --color-brand-500: #7b86ff;
+  --color-brand-600: #6876f5;
+  --color-brand-700: #5762dd;
 }
 
 :root {
-  color-scheme: light;
-  --bg: #eef0f7;
-  --surface: #ffffff;
-  --surface-muted: #f2f3fa;
-  --border-subtle: #e6e8ef;
-  --border-strong: #d4d7e1;
-  --text-hi: #1b1f2a;
-  --text-mid: #555b6b;
-  --text-low: #8a91a1;
-  --accent: #5b68f0;
-  --accent-weak: rgba(91, 104, 240, 0.1);
-  --accent-ring: rgba(91, 104, 240, 0.3);
-  --shadow-soft: 0 1px 2px rgba(23, 28, 48, 0.05), 0 4px 16px rgba(23, 28, 48, 0.06);
+  color-scheme: dark;
+  --bg: #10131f;
+  --surface: #161a2b;
+  --surface-muted: #1c2136;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --text-hi: #e9ecf6;
+  --text-mid: #a7aec7;
+  --text-low: #6d7591;
+  --accent: #7b86ff;
+  --accent-weak: rgba(123, 134, 255, 0.14);
+  --accent-ring: rgba(123, 134, 255, 0.35);
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
 * {
@@ -37,9 +37,9 @@ body {
 
 body {
   background:
-    radial-gradient(1000px 520px at 12% -8%, rgba(91, 104, 240, 0.16), transparent 55%),
-    radial-gradient(900px 500px at 112% 8%, rgba(139, 92, 246, 0.12), transparent 52%),
-    radial-gradient(700px 460px at 50% 110%, rgba(52, 211, 153, 0.09), transparent 55%),
+    radial-gradient(1100px 540px at 12% -8%, rgba(123, 134, 255, 0.22), transparent 55%),
+    radial-gradient(900px 520px at 112% 8%, rgba(139, 92, 246, 0.14), transparent 52%),
+    radial-gradient(720px 480px at 50% 112%, rgba(52, 211, 153, 0.1), transparent 55%),
     var(--bg);
   color: var(--text-hi);
   font-family: var(--font-sans);
@@ -70,12 +70,12 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c9cdd9;
+  background: var(--border-strong);
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #adb2c2;
+  background: rgba(255, 255, 255, 0.24);
 }
 
 ::-webkit-scrollbar-track {

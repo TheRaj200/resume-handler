@@ -72,7 +72,7 @@ export function PersonalSection() {
     <form onSubmit={handleSubmit} className="space-y-3">
       <Card className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
             Personal details
           </h3>
           {status === "saved" ? <Badge tone="emerald">Saved</Badge> : null}
@@ -148,7 +148,7 @@ export function PersonalSection() {
       </Card>
 
       <Card className="space-y-3">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
           Address
         </h3>
 

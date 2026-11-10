@@ -86,10 +86,10 @@ export function ExperienceSection() {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
             Work experience
           </h3>
-          <p className="mt-0.5 text-[11px] text-slate-500">
+          <p className="mt-0.5 text-[11px] text-slate-400">
             {sorted.length} {sorted.length === 1 ? "entry" : "entries"}
           </p>
         </div>
@@ -163,7 +163,7 @@ export function ExperienceSection() {
               </Field>
             </div>
 
-            <label className="flex items-center gap-2 text-xs text-slate-500">
+            <label className="flex items-center gap-2 text-xs text-slate-400">
               <input
                 type="checkbox"
                 checked={form.current ?? false}
@@ -211,7 +211,7 @@ export function ExperienceSection() {
       ) : null}
 
       {sorted.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-6 text-center text-xs text-slate-500">
+        <p className="rounded-xl border border-dashed border-white/10 bg-white/[0.04] px-3 py-6 text-center text-xs text-slate-400">
           No experience yet. Add your first role to power autofill and resumes.
         </p>
       ) : (
@@ -221,13 +221,13 @@ export function ExperienceSection() {
               <Card className="space-y-2 p-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-slate-800">
+                    <p className="truncate text-sm font-medium text-slate-100">
                       {experience.designation}
                     </p>
-                    <p className="truncate text-xs text-slate-500">
+                    <p className="truncate text-xs text-slate-400">
                       {experience.company}
                     </p>
-                    <p className="mt-1 text-[10px] text-slate-500">
+                    <p className="mt-1 text-[10px] text-slate-400">
                       {experience.startDate ?? "—"} –{" "}
                       {experience.current ? "Present" : experience.endDate ?? "—"}
                     </p>

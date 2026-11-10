@@ -577,10 +577,10 @@ export function AutofillWorkflow() {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
             Autofill
           </h3>
-          <p className="mt-0.5 text-[11px] text-slate-500">
+          <p className="mt-0.5 text-[11px] text-slate-400">
             Sirf aapke profile data se fill hota hai. Submit kabhi automatic nahi hota.
           </p>
         </div>
@@ -634,7 +634,7 @@ export function AutofillWorkflow() {
             </div>
 
             <div className="flex flex-wrap gap-3 pt-1">
-              <label className="flex items-center gap-1.5 text-[11px] text-slate-500">
+              <label className="flex items-center gap-1.5 text-[11px] text-slate-400">
                 <input
                   type="checkbox"
                   checked={rememberMappings}
@@ -643,7 +643,7 @@ export function AutofillWorkflow() {
                 />
                 Remember mappings for {domain}
               </label>
-              <label className="flex items-center gap-1.5 text-[11px] text-slate-500">
+              <label className="flex items-center gap-1.5 text-[11px] text-slate-400">
                 <input
                   type="checkbox"
                   checked={attachResume && Boolean(defaultResume)}
@@ -673,12 +673,12 @@ export function AutofillWorkflow() {
               >
                 {learning ? "Saving..." : "Remember new answers"}
               </Button>
-              <span className="text-[10px] text-slate-500">
+              <span className="text-[10px] text-slate-400">
                 Manual answers ko Rescan ke baad save karein
               </span>
             </div>
             {learnMessage ? (
-              <p className="rounded-xl border border-indigo-400/20 bg-brand-500/10 px-3 py-2 text-[11px] text-indigo-700">
+              <p className="rounded-xl border border-indigo-400/20 bg-brand-500/150/150/10 px-3 py-2 text-[11px] text-indigo-200">
                 {learnMessage}
               </p>
             ) : null}
@@ -720,10 +720,10 @@ export function AutofillWorkflow() {
                           onChange={() => handleToggle(row.id)}
                         />
                         <div className="min-w-0">
-                          <p className="truncate text-xs font-medium text-slate-700">
+                          <p className="truncate text-xs font-medium text-slate-200">
                             {row.field.label}
                           </p>
-                          <p className="truncate text-[10px] text-slate-500">
+                          <p className="truncate text-[10px] text-slate-400">
                             {row.field.domPath}
                           </p>
                         </div>
@@ -737,7 +737,7 @@ export function AutofillWorkflow() {
 
                     <div className="flex items-center gap-2">
                       <select
-                        className="w-44 shrink-0 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] text-slate-700 outline-none focus:border-indigo-400/60"
+                        className="w-44 shrink-0 rounded-lg border border-white/10 bg-slate-900/70 px-2 py-1.5 text-[11px] text-slate-100 outline-none focus:border-indigo-400/60"
                         value={row.profileKey}
                         disabled={isFileField}
                         onChange={(event) => handleProfileKeyChange(row.id, event.target.value)}
@@ -767,8 +767,8 @@ export function AutofillWorkflow() {
 
           {blocked.length > 0 ? (
             <Card className="space-y-1 p-3">
-              <p className="text-[11px] font-semibold text-slate-500">Not fillable</p>
-              <ul className="space-y-1 text-[10px] text-slate-500">
+              <p className="text-[11px] font-semibold text-slate-400">Not fillable</p>
+              <ul className="space-y-1 text-[10px] text-slate-400">
                 {blocked.map((entry) => (
                   <li key={entry.field.elementId}>
                     {entry.field.label} — {entry.reason}
@@ -779,7 +779,7 @@ export function AutofillWorkflow() {
           ) : null}
 
           <div className="flex items-center justify-between">
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-slate-400">
               {reviewCount > 0
                 ? `${reviewCount} fields review ke saath fill honge.`
                 : "High-confidence mappings auto-fill honge."}
@@ -801,7 +801,7 @@ export function AutofillWorkflow() {
           {report ? (
             <Card className="space-y-2 p-3">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold text-slate-700">Fill report</p>
+                <p className="text-xs font-semibold text-slate-200">Fill report</p>
                 <Button
                   variant="secondary"
                   onClick={() => void handleUndo()}
@@ -828,9 +828,9 @@ export function AutofillWorkflow() {
               ) : null}
 
               {trackedAppId ? (
-                <div className="mt-2 flex items-center justify-between rounded-xl border border-indigo-500/20 bg-brand-500/10 p-2.5">
+                <div className="mt-2 flex items-center justify-between rounded-xl border border-indigo-500/20 bg-brand-500/150/150/10 p-2.5">
                   <div className="min-w-0 pr-2">
-                    <p className="text-xs font-medium text-slate-700">Tracked in Applications</p>
+                    <p className="text-xs font-medium text-slate-200">Tracked in Applications</p>
                     <p className="text-[10px] text-slate-400">
                       {isMarkedApplied
                         ? "Status: APPLIED"

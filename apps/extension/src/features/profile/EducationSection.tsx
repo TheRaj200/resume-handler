@@ -84,10 +84,10 @@ export function EducationSection() {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
             Education
           </h3>
-          <p className="mt-0.5 text-[11px] text-slate-500">
+          <p className="mt-0.5 text-[11px] text-slate-400">
             {sorted.length} {sorted.length === 1 ? "entry" : "entries"}
           </p>
         </div>
@@ -202,7 +202,7 @@ export function EducationSection() {
       ) : null}
 
       {sorted.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-6 text-center text-xs text-slate-500">
+        <p className="rounded-xl border border-dashed border-white/10 bg-white/[0.04] px-3 py-6 text-center text-xs text-slate-400">
           No education yet. Add your degree to complete the profile.
         </p>
       ) : (
@@ -211,14 +211,14 @@ export function EducationSection() {
             <li key={education.id}>
               <Card className="flex items-start justify-between gap-3 p-3">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-slate-800">
+                  <p className="truncate text-sm font-medium text-slate-100">
                     {education.degree}
                     {education.field ? ` · ${education.field}` : ""}
                   </p>
-                  <p className="truncate text-xs text-slate-500">
+                  <p className="truncate text-xs text-slate-400">
                     {education.institution}
                   </p>
-                  <p className="mt-1 text-[10px] text-slate-500">
+                  <p className="mt-1 text-[10px] text-slate-400">
                     {education.graduationYear ?? "—"}
                     {education.grade ? ` · ${education.grade}` : ""}
                   </p>

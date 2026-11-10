@@ -57,7 +57,7 @@ function CustomFieldControl({
 
   if (field.fieldType === "boolean") {
     return (
-      <label className="flex items-center gap-2 text-xs text-slate-500">
+      <label className="flex items-center gap-2 text-xs text-slate-400">
         <input
           type="checkbox"
           checked={value === true}
@@ -215,10 +215,10 @@ export function CustomFieldsSection() {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
             Custom fields
           </h3>
-          <p className="mt-0.5 text-[11px] text-slate-500">
+          <p className="mt-0.5 text-[11px] text-slate-400">
             Portal-specific questions (notice period, visa, portfolio, etc.)
           </p>
         </div>
@@ -318,7 +318,7 @@ export function CustomFieldsSection() {
       ) : null}
 
       {sorted.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-6 text-center text-xs text-slate-500">
+        <p className="rounded-xl border border-dashed border-white/10 bg-white/[0.04] px-3 py-6 text-center text-xs text-slate-400">
           No custom fields yet. Add questions that appear repeatedly on application forms.
         </p>
       ) : (
@@ -327,8 +327,8 @@ export function CustomFieldsSection() {
             <Card key={field.id} className="space-y-2 p-3">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-medium text-slate-800">{field.label}</p>
-                  <p className="mt-0.5 text-[10px] text-slate-500">
+                  <p className="text-sm font-medium text-slate-100">{field.label}</p>
+                  <p className="mt-0.5 text-[10px] text-slate-400">
                     {field.fieldType}
                     {field.isSensitive ? " · sensitive" : ""}
                   </p>
