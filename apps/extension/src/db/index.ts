@@ -1013,6 +1013,13 @@ export async function getResumeVersion(id: string): Promise<ResumeVersion | unde
   return db.resumeVersions.get(id);
 }
 
+export async function deleteResumeVersion(id: string): Promise<void> {
+  const version = await db.resumeVersions.get(id);
+  if (!version) return;
+  await db.resumeVersions.delete(id);
+  await enqueueSync("resumeVersion", id, "delete", undefined, version.version);
+}
+
 export async function linkResumeVersionToApplication(
   applicationId: string,
   resumeVersionId: string,

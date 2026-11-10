@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
+import { PDFArray, PDFDocument, PDFName, PDFString, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 import type { TailoredResume } from "@jobpilot/shared";
 import { splitIntoResumeBullets } from "./generator";
 
@@ -131,6 +131,57 @@ class ResumeWriter {
     this.y -= options.gapAfter ?? 0;
   }
 
+  linkedText(value: string, url: string, options: { size?: number; color?: ReturnType<typeof rgb> } = {}): void {
+    const size = options.size ?? 9;
+    const color = options.color ?? ACCENT;
+    const safeValue = sanitizeText(value);
+    const width = this.font.widthOfTextAtSize(safeValue, size);
+    this.ensureSpace(size * LINE_HEIGHT);
+    const baseline = this.y - size;
+    this.page.drawText(safeValue, { x: MARGIN, y: baseline, size, font: this.font, color });
+    const annotation = this.doc.context.register(this.doc.context.obj({
+      Type: "Annot",
+      Subtype: "Link",
+      Rect: [MARGIN, baseline - 2, MARGIN + width, baseline + size + 2],
+      Border: [0, 0, 0],
+      A: { Type: "Action", S: "URI", URI: PDFString.of(url) },
+    }));
+    const key = PDFName.of("Annots");
+    const existing = this.page.node.lookupMaybe(key, PDFArray);
+    if (existing) existing.push(annotation);
+    else this.page.node.set(key, this.doc.context.obj([annotation]));
+    this.y -= size * LINE_HEIGHT;
+  }
+
+  linkedContact(items: Array<{ label: string; url?: string }>): void {
+    const size = 9;
+    const separator = "  |  ";
+    let x = MARGIN;
+    this.ensureSpace(size * LINE_HEIGHT);
+    for (const [index, item] of items.entries()) {
+      const label = sanitizeText(item.label);
+      const width = this.font.widthOfTextAtSize(label, size);
+      this.page.drawText(label, { x, y: this.y - size, size, font: this.font, color: item.url ? ACCENT : MUTED });
+      if (item.url) {
+        const annotation = this.doc.context.register(this.doc.context.obj({
+          Type: "Annot", Subtype: "Link",
+          Rect: [x, this.y - size - 2, x + width, this.y + 2], Border: [0, 0, 0],
+          A: { Type: "Action", S: "URI", URI: PDFString.of(item.url) },
+        }));
+        const key = PDFName.of("Annots");
+        const existing = this.page.node.lookupMaybe(key, PDFArray);
+        if (existing) existing.push(annotation);
+        else this.page.node.set(key, this.doc.context.obj([annotation]));
+      }
+      x += width;
+      if (index < items.length - 1) {
+        this.page.drawText(separator, { x, y: this.y - size, size, font: this.font, color: MUTED });
+        x += this.font.widthOfTextAtSize(separator, size);
+      }
+    }
+    this.y -= size * LINE_HEIGHT + 4;
+  }
+
   heading(title: string): void {
     const size = 10.5;
     this.ensureSpace(size * 2.6);
@@ -214,16 +265,19 @@ export async function generateResumePdf(resume: TailoredResume): Promise<Uint8Ar
   }
 
   const contact = [
-    resume.contact.email,
-    resume.contact.phone,
-    resume.contact.location,
-    resume.contact.linkedin,
-    resume.contact.github,
-    resume.contact.portfolio,
-  ].filter(Boolean).map((value) => compactContact(String(value)));
+    { label: resume.contact.email, url: resume.contact.email ? `mailto:${resume.contact.email}` : undefined },
+    { label: resume.contact.phone },
+    { label: resume.contact.location },
+    { label: resume.contact.linkedin, url: resume.contact.linkedin },
+    { label: resume.contact.github, url: resume.contact.github },
+    { label: resume.contact.portfolio, url: resume.contact.portfolio },
+  ].filter((item): item is { label: string; url?: string } => Boolean(item.label)).map((item) => ({
+    ...item,
+    label: compactContact(String(item.label)),
+  }));
 
   if (contact.length > 0) {
-    writer.text(contact.join("  |  "), { size: 9, color: MUTED, gapAfter: 4 });
+    writer.linkedContact(contact);
   }
 
   if (resume.summary) {
@@ -272,7 +326,7 @@ export async function generateResumePdf(resume: TailoredResume): Promise<Uint8Ar
        for (const description of splitIntoResumeBullets(project.description, 4)) {
          if (description) writer.bullet(description);
        }
-      if (project.url) writer.text(project.url, { size: 8.6, color: MUTED });
+       if (project.url) writer.linkedText(compactContact(project.url), project.url, { size: 8.6 });
       writer.space(3);
     }
   }
@@ -290,6 +344,12 @@ export async function generateResumePdf(resume: TailoredResume): Promise<Uint8Ar
     }
   }
 
+  // Resume exports are intentionally single-page. The generator already limits
+  // each section; this final guard prevents an accidental second page from
+  // being added when a user edits a very long bullet in Studio.
+  while (doc.getPageCount() > 1) {
+    doc.removePage(doc.getPageCount() - 1);
+  }
   return doc.save();
 }
 

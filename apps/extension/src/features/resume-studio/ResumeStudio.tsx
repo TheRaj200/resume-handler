@@ -12,6 +12,7 @@ import {
   getProfile,
   getResumeFile,
   listResumeVersions,
+  deleteResumeVersion,
   saveResumeVersion,
 } from "../../db";
 import {
@@ -69,13 +70,13 @@ function compactContact(value: string): string {
 
 function ResumePreview({ resume }: { resume: TailoredResume }) {
   const contact = [
-    resume.contact.email,
-    resume.contact.phone,
-    resume.contact.location,
-    resume.contact.linkedin,
-    resume.contact.github,
-    resume.contact.portfolio,
-  ].filter(Boolean).map((value) => compactContact(String(value)));
+    { label: resume.contact.email, href: resume.contact.email ? `mailto:${resume.contact.email}` : undefined },
+    { label: resume.contact.phone },
+    { label: resume.contact.location },
+    { label: resume.contact.linkedin, href: resume.contact.linkedin },
+    { label: resume.contact.github, href: resume.contact.github },
+    { label: resume.contact.portfolio, href: resume.contact.portfolio },
+  ].filter((item): item is { label: string; href?: string } => Boolean(item.label));
 
   return (
     <div className="mx-auto min-h-[842px] w-full max-w-[620px] rounded-lg bg-white px-9 py-9 text-slate-900 shadow-xl">
@@ -83,7 +84,14 @@ function ResumePreview({ resume }: { resume: TailoredResume }) {
       <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-indigo-700">
         {resume.targetRole}
       </p>
-      <p className="mt-1 text-[8px] leading-relaxed text-slate-600">{contact.join(" | ")}</p>
+      <p className="mt-1 flex flex-wrap gap-x-1 text-[8px] leading-relaxed text-slate-600">
+        {contact.map((item, index) => (
+          <span key={`${item.label}-${index}`}>
+            {index > 0 ? " | " : ""}
+            {item.href ? <a className="text-indigo-700 underline" href={item.href}>{compactContact(item.label)}</a> : compactContact(item.label)}
+          </span>
+        ))}
+      </p>
 
       {resume.summary ? (
         <section className="mt-3">
@@ -138,7 +146,9 @@ function ResumePreview({ resume }: { resume: TailoredResume }) {
           </h2>
           {resume.projects.map((project, index) => (
             <div key={`${project.name}-${index}`} className="mt-1.5">
-              <p className="text-[8.5px] font-bold">{project.name}</p>
+              <p className="text-[8.5px] font-bold">
+                {project.name}{project.url ? <> {" · "}<a className="font-normal text-indigo-700 underline" href={project.url}>Project link</a></> : null}
+              </p>
               <p className="text-[7.5px] text-slate-500">{project.technologies.join(", ")}</p>
               <ul className="mt-1 space-y-0.5 text-[8px] leading-relaxed">
                 {splitIntoResumeBullets(project.description, 4).map((bullet, bulletIndex) => (
@@ -575,6 +585,29 @@ export function ResumeStudio() {
     });
   }
 
+  function updateProject(index: number, patch: Partial<TailoredResume["projects"][number]>) {
+    setResume((previous) =>
+      previous
+        ? {
+            ...previous,
+            projects: previous.projects.map((project, projectIndex) =>
+              projectIndex === index ? { ...project, ...patch } : project,
+            ),
+          }
+        : previous,
+    );
+  }
+
+  async function handleDeleteVersion(version: ResumeVersion) {
+    if (!window.confirm(`Delete resume version v${version.versionNumber}?`)) return;
+    try {
+      await deleteResumeVersion(version.id);
+      setNotice(`Version v${version.versionNumber} deleted.`);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Could not delete version");
+    }
+  }
+
   function addSkill() {
     const name = newSkill.trim();
     if (!name) return;
@@ -934,6 +967,29 @@ export function ResumeStudio() {
               </div>
             </div>
 
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-slate-300">Projects & links</p>
+              {resume.projects.map((project, projectIndex) => (
+                <div key={`${project.name}-${projectIndex}`} className="space-y-2 rounded-xl border border-white/10 bg-white/[0.02] p-3">
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <Field label="Project name">
+                      <input className={inputClass} value={project.name} onChange={(event) => updateProject(projectIndex, { name: event.target.value })} />
+                    </Field>
+                    <Field label="Project URL (clickable in PDF)">
+                      <input className={inputClass} type="url" value={project.url ?? ""} placeholder="https://github.com/..." onChange={(event) => updateProject(projectIndex, { url: event.target.value || undefined })} />
+                    </Field>
+                  </div>
+                  <Field label="Technologies (comma separated)">
+                    <input className={inputClass} value={project.technologies.join(", ")} onChange={(event) => updateProject(projectIndex, { technologies: event.target.value.split(",").map((item) => item.trim()).filter(Boolean) })} />
+                  </Field>
+                  <Field label="Description">
+                    <textarea className={`${inputClass} min-h-16 resize-y text-[11px]`} value={project.description} onChange={(event) => updateProject(projectIndex, { description: event.target.value })} />
+                  </Field>
+                </div>
+              ))}
+              {resume.projects.length === 0 ? <p className="text-[11px] text-slate-500">No projects in this draft. Add project URLs in Profile → Projects, then regenerate.</p> : null}
+            </div>
+
             <p className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2 text-[11px] leading-relaxed text-slate-500">
               AI-generated bullets source fact IDs se locked hote hain. User-added bullets aur
               skills manually tumhari responsibility hain — inhe profile fact ke bina mat add karo.
@@ -969,9 +1025,10 @@ export function ResumeStudio() {
                       </p>
                       <p className="text-[10px] text-slate-500">{formatDate(version.createdAt)}</p>
                     </div>
-                    <Button variant="ghost" onClick={() => handleLoadVersion(version)}>
-                      Load
-                    </Button>
+                     <div className="flex shrink-0 gap-1">
+                       <Button variant="ghost" onClick={() => handleLoadVersion(version)}>Load</Button>
+                       <Button variant="ghost" onClick={() => void handleDeleteVersion(version)}>Delete</Button>
+                     </div>
                   </li>
                 ))}
               </ul>
