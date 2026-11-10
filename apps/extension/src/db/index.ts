@@ -112,6 +112,28 @@ export class JobPilotDB extends Dexie {
       syncQueue: "id, entity, updatedAt",
       conflicts: "id, entity, createdAt",
     });
+
+    // v2 adds the sync stores for users who already installed an earlier build.
+    // Keep the existing stores in the schema so Dexie upgrades the database
+    // without deleting any local profile, resume, or application data.
+    this.version(2).stores({
+      profile: "id, updatedAt",
+      experiences: "id, company, startDate, updatedAt",
+      educations: "id, institution, graduationYear, updatedAt",
+      skills: "id, name, category, updatedAt",
+      projects: "id, name, updatedAt",
+      customFields: "id, &fieldKey, updatedAt",
+      customFieldValues: "id, fieldId, updatedAt",
+      resumes: "id, title, updatedAt",
+      files: "id, mimeType, updatedAt",
+      resumeVersions: "id, resumeId, applicationId, createdAt",
+      applications: "id, company, status, appliedAt, normalizedUrl, updatedAt",
+      applicationEvents: "id, applicationId, createdAt",
+      fieldMappings: "id, domain, fingerprint",
+      settings: "key",
+      syncQueue: "id, entity, updatedAt",
+      conflicts: "id, entity, createdAt",
+    });
   }
 }
 
