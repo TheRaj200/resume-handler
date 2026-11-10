@@ -186,8 +186,21 @@ export function AutofillWorkflow() {
       const rememberedAnswers = await getRememberedFormAnswers(targetDomain);
       const rememberedByKey = new Map(rememberedAnswers.map((answer) => [answer.key, answer]));
 
-      const context = await getPageContext(tab.id);
+      const [context, jobDescription] = await Promise.all([
+        getPageContext(tab.id),
+        extractJd(tab.id),
+      ]);
       setPageContext(context);
+      await chrome.storage.session.set({
+        [STORAGE_KEYS.resumeJobContext]: {
+          jdText: jobDescription?.trim() ?? "",
+          targetRole: context?.jobTitle ?? "",
+          targetCompany: context?.company ?? "",
+          url: tab.url,
+          domain: targetDomain,
+          capturedAt: new Date().toISOString(),
+        },
+      });
 
       const dup = await findDuplicateApplication(tab.url, context?.company, context?.jobTitle);
       setDuplicateApp(dup ?? null);

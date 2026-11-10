@@ -7,7 +7,7 @@ import {
   type PageContext,
 } from "@jobpilot/shared";
 import { countApplications, countResumes, db, getProfile } from "../db";
-import { getActiveTab, getPageContext, isInjectableUrl } from "../lib/content-script";
+import { extractJd, getActiveTab, getPageContext, isInjectableUrl } from "../lib/content-script";
 import { Badge, Button, Card, EmptyState, type BadgeTone } from "../components/ui";
 import { AutofillWorkflow } from "../features/autofill/AutofillWorkflow";
 import { ProfileEditor } from "../features/profile/ProfileEditor";
@@ -94,6 +94,33 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
 
   const [context, setContext] = useState<PageContext | null>(null);
 
+  async function buildResumeForJob(): Promise<void> {
+    const tab = await getActiveTab();
+    if (!tab?.id || !tab.url || !isInjectableUrl(tab.url)) {
+      onNavigate("studio");
+      return;
+    }
+    const [jdText, pageContext] = await Promise.all([
+      extractJd(tab.id).catch(() => null),
+      getPageContext(tab.id).catch(() => null),
+    ]);
+    const stored = await chrome.storage.session.get(STORAGE_KEYS.resumeJobContext);
+    const previous = stored[STORAGE_KEYS.resumeJobContext] as Record<string, unknown> | undefined;
+    await chrome.storage.session.set({
+      [STORAGE_KEYS.resumeJobContext]: {
+        ...previous,
+        jdText: jdText?.trim() || previous?.jdText || "",
+        targetRole: pageContext?.jobTitle || context?.jobTitle || previous?.targetRole || "",
+        targetCompany: pageContext?.company || context?.company || previous?.targetCompany || "",
+        url: tab.url,
+        domain: new URL(tab.url).hostname,
+        autoGenerate: true,
+        capturedAt: new Date().toISOString(),
+      },
+    });
+    onNavigate("studio");
+  }
+
   useEffect(() => {
     let cancelled = false;
 
@@ -131,7 +158,7 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
           )}
         </div>
 
-        <Button className="mt-3 w-full" onClick={() => onNavigate("studio")}>
+        <Button className="mt-3 w-full" onClick={() => void buildResumeForJob()}>
           {context?.hasJobPosting ? "Build resume for this job" : "Open resume builder"}
         </Button>
 

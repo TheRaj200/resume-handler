@@ -184,6 +184,7 @@ export function ResumeStudio() {
   const [aiReady, setAiReady] = useState(false);
   const [aiStatus, setAiStatus] = useState("AI locked");
   const [newSkill, setNewSkill] = useState("");
+  const [autoGenerate, setAutoGenerate] = useState(false);
 
   useEffect(() => {
     void (async () => {
@@ -200,6 +201,24 @@ export function ResumeStudio() {
             ? "AI endpoint permission missing"
             : "AI ready",
       );
+    })();
+  }, []);
+
+  useEffect(() => {
+    void (async () => {
+      const stored = await chrome.storage.session.get(STORAGE_KEYS.resumeJobContext);
+      const pending = stored[STORAGE_KEYS.resumeJobContext] as
+        | { jdText?: string; targetRole?: string; targetCompany?: string; autoGenerate?: boolean }
+        | undefined;
+      if (!pending) return;
+      if (pending.jdText?.trim()) setJdText(pending.jdText);
+      if (pending.targetRole?.trim()) setTargetRole(pending.targetRole);
+      if (pending.targetCompany?.trim()) setTargetCompany(pending.targetCompany);
+      if (pending.autoGenerate) {
+        setMode(getUnlockedApiKey() ? "ai" : "local");
+        setAutoGenerate(true);
+      }
+      await chrome.storage.session.remove(STORAGE_KEYS.resumeJobContext);
     })();
   }, []);
 
@@ -385,6 +404,12 @@ export function ResumeStudio() {
       setBusy(false);
     }
   }
+
+  useEffect(() => {
+    if (!autoGenerate || !jdText.trim() || !targetRole.trim() || profile === undefined || busy) return;
+    setAutoGenerate(false);
+    void handleGenerate();
+  }, [autoGenerate, jdText, targetRole, profile, busy]);
 
   async function handleSaveVersion() {
     if (!resume) return;
