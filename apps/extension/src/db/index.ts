@@ -692,6 +692,7 @@ export async function importParsedResume(
       db.educations,
       db.skills,
       db.projects,
+      db.syncQueue,
     ],
     async () => {
       const existingProfile = await db.profile.get(DEFAULT_PROFILE_ID);
