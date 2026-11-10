@@ -51,7 +51,7 @@ export function ProfileEditor() {
             onClick={() => setActive(section.id)}
             className={`shrink-0 rounded-lg px-2.5 py-1.5 text-[11px] font-medium transition ${
               active === section.id
-                ? "bg-brand-500/150/15 text-brand-200"
+                ? "bg-brand-500/20 text-brand-200"
                 : "text-slate-400 hover:bg-white/[0.08] hover:text-slate-200"
             }`}
           >

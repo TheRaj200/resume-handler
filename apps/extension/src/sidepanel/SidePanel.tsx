@@ -309,11 +309,12 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
   };
 
   return (
-    <div>
-      <div className="mb-2 flex items-center justify-end">
-        <span className="text-[10px] text-slate-400">Drag cards to reorder</span>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between px-1">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Dashboard</span>
+        <span className="text-[10px] text-slate-500">Drag cards to reorder</span>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-3">
         {order.map((id) => {
           const render = sections[id];
           if (!render) return null;
@@ -321,14 +322,16 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
           return (
             <div
               key={id}
-              className={`group relative ${dragging === index ? "drag-over rounded-xl" : ""}`}
+              className={`flex items-stretch gap-2 ${dragging === index ? "drag-over rounded-xl" : ""}`}
               onDragOver={(event) => onDragOver(event, index)}
               onDragEnd={onDragEnd}
             >
-              <div className="absolute -left-1 top-3 z-10">
+              <div className="flex w-6 shrink-0 items-start justify-center pt-3">
                 <DragHandle onDragStart={() => onDragStart(index)} />
               </div>
-              {render({ onDragStart: () => onDragStart(index), onDragOver: () => {}, onDragEnd, dragging: dragging === index })}
+              <div className="min-w-0 flex-1">
+                {render({ onDragStart: () => onDragStart(index), onDragOver: () => {}, onDragEnd, dragging: dragging === index })}
+              </div>
             </div>
           );
         })}
@@ -421,7 +424,7 @@ export function SidePanel() {
                   onClick={() => setActive(tab.id)}
                   className={`relative shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-medium transition ${
                     isActive
-                      ? "bg-brand-500/150/15 text-brand-200"
+                      ? "bg-brand-500/20 text-brand-200"
                       : "text-slate-400 hover:bg-white/[0.08] hover:text-slate-200"
                   }`}
                 >
@@ -435,7 +438,7 @@ export function SidePanel() {
           </nav>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-4 py-4">
+        <main className="flex-1 overflow-y-auto px-5 py-5">
           {active === "dashboard" ? <Dashboard onNavigate={(tab) => setActive(tab)} /> : null}
           {active === "profile" ? <ProfileEditor /> : null}
           {active === "resumes" ? <ResumeLibrary /> : null}

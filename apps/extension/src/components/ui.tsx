@@ -11,7 +11,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`relative rounded-xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset] ${
+      className={`relative rounded-xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-4 shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset] ${
         interactive ? "transition hover:border-white/[0.16] hover:from-white/[0.08]" : ""
       } ${className}`}
     >
