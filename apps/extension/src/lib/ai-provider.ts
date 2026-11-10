@@ -25,6 +25,7 @@ async function readError(response: Response): Promise<string> {
 export function providerOrigin(settings: AISettings): string {
   if (settings.provider === "gemini") return "https://generativelanguage.googleapis.com";
   if (settings.provider === "openai") return "https://api.openai.com";
+  if (settings.provider === "inception") return "https://api.inceptionlabs.ai";
 
   if (!settings.baseUrl) {
     throw new Error("OpenAI-compatible provider ke liye Base URL chahiye.");
@@ -74,7 +75,9 @@ export async function callAiJson<T>(request: AiJsonRequest): Promise<T> {
       const base =
         settings.provider === "openai"
           ? "https://api.openai.com/v1"
-          : (settings.baseUrl ?? "").replace(/\/+$/, "");
+          : settings.provider === "inception"
+            ? "https://api.inceptionlabs.ai/v1"
+            : (settings.baseUrl ?? "").replace(/\/+$/, "");
 
       if (!base) throw new Error("Base URL is required for OpenAI-compatible providers.");
 
@@ -90,7 +93,12 @@ export async function callAiJson<T>(request: AiJsonRequest): Promise<T> {
           { role: "user", content: request.user },
         ],
         temperature: settings.temperature,
-        max_tokens: settings.maxOutputTokens,
+        ...(settings.provider === "inception"
+          ? { max_completion_tokens: settings.maxOutputTokens }
+          : { max_tokens: settings.maxOutputTokens }),
+        ...(settings.provider === "openai" || settings.provider === "inception"
+          ? { response_format: { type: "json_object" } }
+          : {}),
       };
     }
 
@@ -154,7 +162,9 @@ export async function testProviderConnection(
       const base =
         settings.provider === "openai"
           ? "https://api.openai.com/v1"
-          : (settings.baseUrl ?? "").replace(/\/+$/, "");
+          : settings.provider === "inception"
+            ? "https://api.inceptionlabs.ai/v1"
+            : (settings.baseUrl ?? "").replace(/\/+$/, "");
       if (!base) throw new Error("Base URL is required for OpenAI-compatible providers.");
       endpoint = `${base}/models`;
       headers = { authorization: `Bearer ${apiKey}` };

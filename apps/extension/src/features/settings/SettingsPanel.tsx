@@ -259,7 +259,7 @@ export function SettingsPanel() {
     }
   }
 
-  const isCompatibleProvider = settings.provider === "openai-compatible";
+  const isCompatibleProvider = settings.provider === "openai-compatible" || settings.provider === "inception";
 
   async function handleVaultSave() {
     setVaultBusy(true);
@@ -335,7 +335,10 @@ export function SettingsPanel() {
             onChange={(event) =>
               setSettings((previous) => ({
                 ...previous,
-                provider: event.target.value as AISettings["provider"],
+                    provider: event.target.value as AISettings["provider"],
+                    ...(event.target.value === "inception"
+                      ? { model: "mercury-3", baseUrl: "https://api.inceptionlabs.ai/v1" }
+                      : {}),
               }))
             }
           >
@@ -358,8 +361,8 @@ export function SettingsPanel() {
           />
         </Field>
 
-        {isCompatibleProvider ? (
-          <Field label="Base URL" hint="OpenAI-compatible endpoint, e.g. https://api.example.com/v1">
+         {isCompatibleProvider ? (
+           <Field label="Base URL" hint={settings.provider === "inception" ? "Inception API endpoint" : "OpenAI-compatible endpoint, e.g. https://api.example.com/v1"}>
             <input
               className={inputClass}
               value={settings.baseUrl ?? ""}

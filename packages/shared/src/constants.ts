@@ -52,12 +52,13 @@ export type FieldType = (typeof FIELD_TYPES)[number];
 export const WORK_MODES = ["remote", "hybrid", "onsite", "any"] as const;
 export type WorkMode = (typeof WORK_MODES)[number];
 
-export const AI_PROVIDERS = ["gemini", "openai", "openai-compatible"] as const;
+export const AI_PROVIDERS = ["gemini", "openai", "inception", "openai-compatible"] as const;
 export type AIProvider = (typeof AI_PROVIDERS)[number];
 
 export const AI_PROVIDER_LABELS: Record<AIProvider, string> = {
   gemini: "Google Gemini",
   openai: "OpenAI",
+  inception: "Inception Labs (Mercury)",
   "openai-compatible": "OpenAI-compatible",
 };
 
