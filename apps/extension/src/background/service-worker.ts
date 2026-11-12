@@ -6,6 +6,29 @@
  */
 
 import { getSyncSettings, syncNow } from "../lib/sync-client";
+import { STORAGE_KEYS } from "@jobpilot/shared";
+
+let floatingWindowId: number | undefined;
+
+async function openFloatingWindow(): Promise<void> {
+  if (floatingWindowId !== undefined) {
+    try {
+      await chrome.windows.update(floatingWindowId, { focused: true });
+      return;
+    } catch {
+      floatingWindowId = undefined;
+    }
+  }
+
+  const window = await chrome.windows.create({
+    url: chrome.runtime.getURL("float.html"),
+    type: "popup",
+    width: 540,
+    height: 680,
+    focused: true,
+  });
+  if (window?.id !== undefined) floatingWindowId = window.id;
+}
 
 const SYNC_ALARM = "jobpilot-cloud-sync";
 
@@ -24,10 +47,20 @@ async function runBackgroundSync(): Promise<void> {
 }
 
 chrome.runtime.onInstalled.addListener(() => {
-  void chrome.sidePanel
-    .setPanelBehavior({ openPanelOnActionClick: false })
-    .catch(() => undefined);
   void scheduleSyncAlarm();
+});
+
+chrome.action.onClicked.addListener((sourceTab) => {
+  if (sourceTab.id && sourceTab.url && /^https?:/i.test(sourceTab.url)) {
+    void chrome.storage.session.set({ [STORAGE_KEYS.floatingSourceTabId]: sourceTab.id });
+  }
+  void openFloatingWindow().catch((error) => {
+    console.warn("[window] could not open floating JobPilot window:", error);
+  });
+});
+
+chrome.windows.onRemoved.addListener((windowId) => {
+  if (windowId === floatingWindowId) floatingWindowId = undefined;
 });
 
 chrome.runtime.onStartup.addListener(() => {

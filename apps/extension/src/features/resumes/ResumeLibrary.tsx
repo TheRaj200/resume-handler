@@ -8,7 +8,7 @@ import {
   getResumeBlob,
   setDefaultResume,
 } from "../../db";
-import { Badge, Button, Card, EmptyState, type BadgeTone } from "../../components/ui";
+import { Badge, Button, Card, EmptyState, type BadgeTone, useConfirm } from "../../components/ui";
 import { ResumeImportDialog } from "./ResumeImportDialog";
 
 function textStatusBadge(resume: Resume): { label: string; tone: BadgeTone } | null {
@@ -39,6 +39,7 @@ const uploadLabelClass =
   "inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-500 px-3.5 py-2 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-400";
 
 export function ResumeLibrary() {
+  const confirm = useConfirm();
   const resumes = useLiveQuery(() => db.resumes.toArray(), []);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -82,7 +83,7 @@ export function ResumeLibrary() {
   }
 
   async function handleDelete(id: string) {
-    if (!window.confirm("Delete this resume from local storage?")) return;
+    if (!(await confirm("Delete resume?", "This resume will be removed from local storage."))) return;
     await deleteResume(id);
   }
 

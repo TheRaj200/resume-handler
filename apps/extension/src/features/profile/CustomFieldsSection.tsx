@@ -14,7 +14,7 @@ import {
   saveCustomFieldValue,
 } from "../../db";
 import { splitComma } from "../../lib/profile";
-import { Badge, Button, Card, Field, inputClass } from "../../components/ui";
+import { Badge, Button, Card, Field, inputClass, useConfirm } from "../../components/ui";
 
 const emptyFieldForm = {
   label: "",
@@ -142,6 +142,7 @@ function CustomFieldControl({
 }
 
 export function CustomFieldsSection() {
+  const confirm = useConfirm();
   const fields = useLiveQuery(() => db.customFields.toArray(), []);
   const values = useLiveQuery(() => db.customFieldValues.toArray(), []);
   const [form, setForm] = useState(emptyFieldForm);
@@ -197,7 +198,7 @@ export function CustomFieldsSection() {
   }
 
   async function handleDeleteField(id: string) {
-    if (!window.confirm("Delete this field and its saved value?")) return;
+    if (!(await confirm("Delete custom field?", "This field and its saved value will be removed."))) return;
     await deleteCustomField(id);
   }
 

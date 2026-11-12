@@ -90,6 +90,7 @@ export const STORAGE_KEYS = {
   lastSyncAt: "jobpilot.sync.lastAt",
   openTab: "jobpilot.openTab",
   autofillSession: "jobpilot.autofill.session",
+  floatingSourceTabId: "jobpilot.floating.sourceTabId",
 } as const;
 
 export const SIDE_PANEL_PATHS = {

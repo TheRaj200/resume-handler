@@ -51,7 +51,7 @@ import {
   resolveValue,
   type ProfileFact,
 } from "./matcher";
-import { Badge, Button, Card, EmptyState, type BadgeTone } from "../../components/ui";
+import { Badge, Button, Card, EmptyState, Notice, type BadgeTone } from "../../components/ui";
 
 interface PlanRow {
   id: string;
@@ -671,15 +671,13 @@ export function AutofillWorkflow() {
       </div>
 
       {error ? (
-        <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-600">
+        <Notice title="Autofill could not continue" tone="error">
           {error}
-        </p>
+        </Notice>
       ) : null}
 
       {formChanged ? (
-        <p className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-xs text-amber-700">
-          Form change detect hua hai. Latest fields ke liye Rescan karo.
-        </p>
+        <Notice title="Form updated">The page changed after the last scan. Rescan to refresh the fields.</Notice>
       ) : null}
 
       {!scanResult ? (
@@ -695,14 +693,9 @@ export function AutofillWorkflow() {
       ) : (
         <>
           {duplicateApp ? (
-            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-700 space-y-1">
-              <p className="font-semibold flex items-center gap-1.5">
-                <span>⚠️</span> Duplicate Application Detected
-              </p>
-              <p className="text-[11px] text-amber-300/80">
-                You have an existing application for <strong>{duplicateApp.company}</strong> ({duplicateApp.jobTitle}) with status <strong className="text-white">{duplicateApp.status}</strong>.
-              </p>
-            </div>
+            <Notice title="Application already exists">
+              You already have an application for <strong className="text-amber-100/90">{duplicateApp.company}</strong> ({duplicateApp.jobTitle}) with status <strong className="text-amber-100/90">{duplicateApp.status}</strong>.
+            </Notice>
           ) : null}
 
           <Card className="space-y-2 p-3">
@@ -765,16 +758,15 @@ export function AutofillWorkflow() {
             ) : null}
 
             {crossOriginOrigins.length > 0 ? (
-              <p className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-700">
-                Cross-origin iframe detected ({crossOriginOrigins.length}). Uske andar ke fields
-                scan nahi hue. Full cross-origin iframe support Phase 2.5 me aayega.
-              </p>
+              <Notice title="Some fields need manual attention">
+                This page contains an embedded form that the browser keeps separate. Those fields were skipped; the rest of the page is ready.
+              </Notice>
             ) : null}
 
             {scanResult.possibleClosedShadowRoots ? (
-              <p className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-700">
-                Possible closed shadow DOM detected. Uske andar ke fields support nahi hain.
-              </p>
+              <Notice title="A protected section was skipped">
+                One embedded section does not expose its fields to extensions. You can complete those fields manually.
+              </Notice>
             ) : null}
           </Card>
 
@@ -804,8 +796,8 @@ export function AutofillWorkflow() {
                           <p className="truncate text-xs font-medium text-slate-200">
                             {row.field.label}
                           </p>
-                          <p className="truncate text-[10px] text-slate-400">
-                            {row.field.domPath}
+                          <p className="truncate text-[10px] text-slate-500" title={row.field.domPath}>
+                            Detected form field
                           </p>
                         </div>
                       </div>
@@ -816,15 +808,19 @@ export function AutofillWorkflow() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex min-w-0 flex-wrap items-center gap-2">
+                      <span className="shrink-0 text-[10px] font-medium uppercase tracking-[0.08em] text-slate-500">
+                        Fill with
+                      </span>
                       <select
-                        className="w-44 shrink-0 rounded-lg border border-white/10 bg-slate-900/70 px-2 py-1.5 text-[11px] text-slate-100 outline-none focus:border-brand-400/60"
+                        aria-label={`Choose profile field for ${row.field.label}`}
+                        className="min-w-0 flex-1 rounded-lg border border-white/10 bg-slate-900/70 px-2 py-1.5 text-[11px] text-slate-100 outline-none focus:border-brand-400/60"
                         value={row.profileKey}
                         disabled={isFileField}
                         onChange={(event) => handleProfileKeyChange(row.id, event.target.value)}
                       >
                         <option value="">
-                          {row.profileKey ? "Skip" : "Choose profile field..."}
+                          {row.profileKey ? "Skip this field" : "Choose saved profile data..."}
                         </option>
                         {facts.map((fact) => (
                           <option key={fact.key} value={fact.key}>
@@ -832,8 +828,8 @@ export function AutofillWorkflow() {
                           </option>
                         ))}
                       </select>
-                      <span className="truncate text-[11px] text-slate-400">
-                        {isFile ? "Default resume attach hogi" : formatValue(row.value)}
+                      <span className="min-w-0 truncate text-[11px] text-slate-400" title={formatValue(row.value)}>
+                        {isFile ? "Default resume will be attached" : row.profileKey ? `Preview: ${formatValue(row.value)}` : "Not mapped yet"}
                       </span>
                     </div>
 

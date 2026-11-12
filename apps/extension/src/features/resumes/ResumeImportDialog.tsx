@@ -18,7 +18,7 @@ import {
 } from "../../db";
 import { hasProviderPermission } from "../../lib/ai-provider";
 import { getUnlockedApiKey, restoreVaultSession } from "../../lib/crypto-vault";
-import { Badge, Button, Field, inputClass } from "../../components/ui";
+import { Badge, Button, Field, inputClass, useConfirm } from "../../components/ui";
 import { extractResumeText, inferResumeExtension, looksLikeScannedPdf, truncateForParsing } from "./extract";
 import { parseResumeLocally } from "./parser";
 import { parseResumeWithAi } from "./ai-parse";
@@ -52,6 +52,7 @@ function SectionCard({
   onToggle: (value: boolean) => void;
   children: ReactNode;
 }) {
+  const confirm = useConfirm();
   return (
     <section className="space-y-2 rounded-xl border border-white/10 bg-white/[0.04] p-3">
       <div className="flex items-start justify-between gap-2">
@@ -90,6 +91,7 @@ export function ResumeImportDialog({
   onClose: () => void;
   onImported: (message: string) => void;
 }) {
+  const confirm = useConfirm();
   const [phase, setPhase] = useState<"extracting" | "ready" | "error">("extracting");
   const [extraction, setExtraction] = useState<ResumeExtraction | null>(null);
   const [parsed, setParsed] = useState<ParsedResume | null>(null);
@@ -282,9 +284,7 @@ export function ResumeImportDialog({
 
     try {
       if (mode === "replace") {
-        const confirmed = window.confirm(
-          "Replace mode selected sections ke existing profile data ko delete karega. Continue?",
-        );
+        const confirmed = await confirm("Replace existing data?", "Selected profile sections will be replaced by the imported data.");
         if (!confirmed) {
           setSaving(false);
           return;

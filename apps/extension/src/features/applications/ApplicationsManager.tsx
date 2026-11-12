@@ -23,6 +23,7 @@ import {
   EmptyState,
   Field,
   inputClass,
+  useConfirm,
   type BadgeTone,
 } from "../../components/ui";
 
@@ -55,6 +56,7 @@ function formatDateTime(iso?: string): string {
 }
 
 export function ApplicationsManager() {
+  const confirm = useConfirm();
   const applications = useLiveQuery(
     () => db.applications.orderBy("updatedAt").reverse().toArray(),
     [],
@@ -192,7 +194,7 @@ export function ApplicationsManager() {
   }
 
   async function handleDelete(id: string) {
-    if (!window.confirm("Are you sure you want to delete this application?")) return;
+    if (!(await confirm("Delete application?", "This application and its local history will be removed."))) return;
     try {
       await deleteApplication(id, true);
     } catch (cause) {

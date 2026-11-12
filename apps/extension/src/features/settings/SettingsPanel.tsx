@@ -7,7 +7,7 @@ import {
   aiSettingsSchema,
   type AISettings,
 } from "@jobpilot/shared";
-import { Badge, Button, Card, Field, inputClass } from "../../components/ui";
+import { Badge, Button, Card, Field, Notice, inputClass, useConfirm } from "../../components/ui";
 import {
   hasProviderPermission,
   requestProviderPermission,
@@ -47,6 +47,7 @@ const DEFAULT_SETTINGS: AISettings = {
 };
 
 export function SettingsPanel() {
+  const confirm = useConfirm();
   const [settings, setSettings] = useState<AISettings>(DEFAULT_SETTINGS);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -203,7 +204,7 @@ export function SettingsPanel() {
   }
 
   async function handleDeleteAll() {
-    if (!window.confirm("Delete ALL local profile, resume and application data? This cannot be undone.")) return;
+    if (!(await confirm("Delete all local data?", "Your profile, resumes, applications and settings will be permanently removed from this device."))) return;
     setDataBusy(true);
     setError(null);
     try {
@@ -631,11 +632,9 @@ export function SettingsPanel() {
           ) : null}
         </div>
 
-        <p className="rounded-xl border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-[11px] leading-relaxed text-amber-700/80">
-          Security note: key IndexedDB, logs ya backend me kabhi nahi jati. Sirf encrypted
-          ciphertext chrome.storage.local me rehta hai; unlocked key memory me rehti hai aur 15
-          minute inactivity ke baad auto-lock ho jati hai.
-        </p>
+        <Notice title="Your key stays on this device" tone="info">
+          The key is encrypted in local storage and kept in memory only while unlocked. It auto-locks after 15 minutes of inactivity.
+        </Notice>
       </Card>
 
       <Card className="space-y-3">
@@ -710,8 +709,8 @@ export function SettingsPanel() {
         <Button type="button" variant="secondary" onClick={() => void saveSyncSettings(syncSettings)}>Save sync settings</Button>
         {syncMessage ? <p className="rounded-xl border border-brand-400/20 bg-brand-500/10 px-3 py-2 text-[11px] text-brand-200">{syncMessage}</p> : null}
         {conflicts && conflicts.length > 0 ? (
-          <div className="space-y-2 rounded-xl border border-amber-400/20 bg-amber-500/10 p-3">
-            <p className="text-xs font-semibold text-amber-700">Sync conflicts ({conflicts.length})</p>
+          <div className="space-y-2 rounded-xl border border-amber-400/20 bg-amber-400/[0.07] p-3">
+            <p className="text-xs font-semibold text-amber-200">Sync conflicts ({conflicts.length})</p>
             {conflicts.map((conflict) => (
               <div key={conflict.id} className="flex items-center justify-between gap-2 text-[11px] text-slate-400">
                 <span>{conflict.entity} · {conflict.entityId.slice(0, 8)}…</span>
@@ -726,9 +725,9 @@ export function SettingsPanel() {
       </Card>
 
       {error ? (
-        <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-600">
+        <Notice title="Settings could not be saved" tone="error">
           {error}
-        </p>
+        </Notice>
       ) : null}
 
       <div className="flex justify-end">

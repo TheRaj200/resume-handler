@@ -3,7 +3,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { projectInputSchema, type ProjectInput } from "@jobpilot/shared";
 import { db, deleteProject, saveProject } from "../../db";
 import { splitComma } from "../../lib/profile";
-import { Button, Card, Field, inputClass } from "../../components/ui";
+import { Button, Card, Field, inputClass, useConfirm } from "../../components/ui";
 
 const emptyProject: ProjectInput = {
   name: "",
@@ -13,6 +13,7 @@ const emptyProject: ProjectInput = {
 };
 
 export function ProjectsSection() {
+  const confirm = useConfirm();
   const projects = useLiveQuery(() => db.projects.toArray(), []);
   const [form, setForm] = useState<ProjectInput>(emptyProject);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -66,7 +67,7 @@ export function ProjectsSection() {
   }
 
   async function handleDelete(id: string) {
-    if (!window.confirm("Delete this project?")) return;
+    if (!(await confirm("Delete project?", "This project will be removed from your profile."))) return;
     await deleteProject(id);
   }
 

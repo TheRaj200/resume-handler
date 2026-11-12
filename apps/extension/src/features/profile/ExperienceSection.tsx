@@ -6,7 +6,7 @@ import {
 } from "@jobpilot/shared";
 import { db, deleteExperience, saveExperience } from "../../db";
 import { splitLines } from "../../lib/profile";
-import { Button, Card, Field, inputClass } from "../../components/ui";
+import { Button, Card, Field, inputClass, useConfirm } from "../../components/ui";
 
 const emptyExperience: ExperienceInput = {
   company: "",
@@ -18,6 +18,7 @@ const emptyExperience: ExperienceInput = {
 };
 
 export function ExperienceSection() {
+  const confirm = useConfirm();
   const experiences = useLiveQuery(() => db.experiences.toArray(), []);
   const [form, setForm] = useState<ExperienceInput>(emptyExperience);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -78,7 +79,7 @@ export function ExperienceSection() {
   }
 
   async function handleDelete(id: string) {
-    if (!window.confirm("Delete this experience?")) return;
+    if (!(await confirm("Delete experience?", "This experience will be removed from your profile."))) return;
     await deleteExperience(id);
   }
 

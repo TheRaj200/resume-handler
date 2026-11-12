@@ -7,7 +7,6 @@
   "permissions": [
     "storage",
     "tabs",
-    "sidePanel",
     "activeTab",
     "scripting",
     "alarms",
@@ -25,8 +24,7 @@
     "type": "module"
   },
   "action": {
-    "default_title": "JobPilot AI",
-    "default_popup": "popup.html",
+    "default_title": "Open JobPilot AI floating window",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",
@@ -39,9 +37,6 @@
     "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  },
-  "side_panel": {
-    "default_path": "sidepanel.html"
   },
   "options_page": "options.html"
 }

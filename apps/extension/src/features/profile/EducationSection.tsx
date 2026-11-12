@@ -5,7 +5,7 @@ import {
   type EducationInput,
 } from "@jobpilot/shared";
 import { db, deleteEducation, saveEducation } from "../../db";
-import { Button, Card, Field, inputClass } from "../../components/ui";
+import { Button, Card, Field, inputClass, useConfirm } from "../../components/ui";
 
 const emptyEducation: EducationInput = {
   institution: "",
@@ -16,6 +16,7 @@ const emptyEducation: EducationInput = {
 };
 
 export function EducationSection() {
+  const confirm = useConfirm();
   const educations = useLiveQuery(() => db.educations.toArray(), []);
   const [form, setForm] = useState<EducationInput>(emptyEducation);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -76,7 +77,7 @@ export function EducationSection() {
   }
 
   async function handleDelete(id: string) {
-    if (!window.confirm("Delete this education entry?")) return;
+    if (!(await confirm("Delete education entry?", "This education entry will be removed from your profile."))) return;
     await deleteEducation(id);
   }
 

@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { skillInputSchema, type SkillInput } from "@jobpilot/shared";
 import { db, deleteSkill, saveSkill } from "../../db";
-import { Badge, Button, Card, Field, inputClass } from "../../components/ui";
+import { Badge, Button, Card, Field, inputClass, useConfirm } from "../../components/ui";
 
 const emptySkill: SkillInput = {
   name: "",
@@ -13,6 +13,7 @@ const emptySkill: SkillInput = {
 const CATEGORIES = ["language", "framework", "database", "tool", "soft"] as const;
 
 export function SkillsSection() {
+  const confirm = useConfirm();
   const skills = useLiveQuery(() => db.skills.toArray(), []);
   const [form, setForm] = useState<SkillInput>(emptySkill);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -57,7 +58,7 @@ export function SkillsSection() {
   }
 
   async function handleDelete(id: string) {
-    if (!window.confirm("Delete this skill?")) return;
+    if (!(await confirm("Delete skill?", "This skill will be removed from your profile."))) return;
     await deleteSkill(id);
   }
 

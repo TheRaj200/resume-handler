@@ -26,7 +26,7 @@ import {
   hasProviderPermission,
 } from "../../lib/ai-provider";
 import { getUnlockedApiKey, restoreVaultSession } from "../../lib/crypto-vault";
-import { Badge, Button, Card, EmptyState, Field, inputClass } from "../../components/ui";
+import { Badge, Button, Card, EmptyState, Field, inputClass, useConfirm } from "../../components/ui";
 import {
   analyzeJd,
   type JdAnalysis,
@@ -186,6 +186,7 @@ function ResumePreview({ resume }: { resume: TailoredResume }) {
 }
 
 export function ResumeStudio() {
+  const confirm = useConfirm();
   const profile = useLiveQuery(() => getProfile(), []);
   const experiences = useLiveQuery(() => db.experiences.toArray(), []);
   const educations = useLiveQuery(() => db.educations.toArray(), []);
@@ -599,7 +600,7 @@ export function ResumeStudio() {
   }
 
   async function handleDeleteVersion(version: ResumeVersion) {
-    if (!window.confirm(`Delete resume version v${version.versionNumber}?`)) return;
+    if (!(await confirm("Delete resume version?", `Resume version v${version.versionNumber} will be removed from history.`))) return;
     try {
       await deleteResumeVersion(version.id);
       setNotice(`Version v${version.versionNumber} deleted.`);

@@ -8,8 +8,8 @@ export async function openFloatingWindow(): Promise<void> {
   await chrome.windows.create({
     url,
     type: "popup",
-    width: 980,
-    height: 720,
+    width: 540,
+    height: 680,
     focused: true,
   });
 }

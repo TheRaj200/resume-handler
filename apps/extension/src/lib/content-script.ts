@@ -7,6 +7,7 @@ import type {
   PageContextResponse,
   ScanFormResponse,
 } from "@jobpilot/shared";
+import { STORAGE_KEYS } from "@jobpilot/shared";
 
 export function isInjectableUrl(url?: string): boolean {
   return Boolean(url && /^https?:/i.test(url));
@@ -26,6 +27,21 @@ export async function requestPagePermission(url?: string): Promise<boolean> {
 
 export async function getActiveTab(): Promise<chrome.tabs.Tab | undefined> {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (tab?.url && isInjectableUrl(tab.url)) return tab;
+
+  // A floating JobPilot window becomes the focused window. In that case the
+  // active tab is float.html, so fall back to the page from which it opened.
+  const stored = await chrome.storage.session.get(STORAGE_KEYS.floatingSourceTabId);
+  const sourceTabId = stored[STORAGE_KEYS.floatingSourceTabId];
+  if (typeof sourceTabId === "number") {
+    try {
+      const sourceTab = await chrome.tabs.get(sourceTabId);
+      if (sourceTab.url && isInjectableUrl(sourceTab.url)) return sourceTab;
+    } catch {
+      await chrome.storage.session.remove(STORAGE_KEYS.floatingSourceTabId);
+    }
+  }
+
   return tab;
 }
 

@@ -1,4 +1,50 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ButtonHTMLAttributes, type ReactNode } from "react";
+
+type ConfirmRequest = { title: string; message: string; resolve: (value: boolean) => void };
+const ConfirmContext = createContext<(title: string, message: string) => Promise<boolean>>(() => Promise.resolve(false));
+
+export function ConfirmProvider({ children }: { children: ReactNode }) {
+  const [request, setRequest] = useState<ConfirmRequest | null>(null);
+  const confirm = useCallback((title: string, message: string) => new Promise<boolean>((resolve) => setRequest({ title, message, resolve })), []);
+  const close = (value: boolean) => {
+    request?.resolve(value);
+    setRequest(null);
+  };
+  useEffect(() => {
+    if (!request) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") close(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [request]);
+  return (
+    <ConfirmContext.Provider value={confirm}>
+      {children}
+      {request ? (
+        <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/70 p-4 backdrop-blur-sm" onMouseDown={() => close(false)}>
+          <div role="dialog" aria-modal="true" className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#171a29] p-5 shadow-2xl shadow-black/50" onMouseDown={(event) => event.stopPropagation()}>
+            <div className="mb-4 flex items-start gap-3">
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-rose-500/15 text-rose-300">!</div>
+              <div>
+                <h2 className="text-sm font-semibold text-slate-100">{request.title}</h2>
+                <p className="mt-1 text-xs leading-relaxed text-slate-400">{request.message}</p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button type="button" onClick={() => close(false)} className="rounded-xl border border-white/10 px-3.5 py-2 text-xs font-medium text-slate-300 transition hover:bg-white/[0.07]">Cancel</button>
+              <button type="button" onClick={() => close(true)} className="rounded-xl bg-rose-500 px-3.5 py-2 text-xs font-semibold text-white shadow-lg shadow-rose-500/20 transition hover:bg-rose-400 active:scale-[0.98]">Delete</button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </ConfirmContext.Provider>
+  );
+}
+
+export function useConfirm() {
+  return useContext(ConfirmContext);
+}
 
 export function Card({
   children,
@@ -117,6 +163,32 @@ export function EmptyState({
       <p className="text-sm font-medium text-slate-200">{title}</p>
       <p className="mx-auto mt-1 max-w-xs text-xs leading-relaxed text-slate-400">{description}</p>
       {action ? <div className="mt-4">{action}</div> : null}
+    </div>
+  );
+}
+
+export function Notice({
+  title,
+  children,
+  tone = "warning",
+}: {
+  title: string;
+  children: ReactNode;
+  tone?: "warning" | "error" | "info";
+}) {
+  const styles = {
+    warning: ["border-amber-400/20 bg-amber-400/[0.07]", "bg-amber-400/15 text-amber-300", "text-amber-200", "text-amber-100/60", "!"],
+    error: ["border-rose-400/20 bg-rose-400/[0.07]", "bg-rose-400/15 text-rose-300", "text-rose-200", "text-rose-100/65", "×"],
+    info: ["border-brand-400/20 bg-brand-400/[0.07]", "bg-brand-400/15 text-brand-200", "text-brand-200", "text-brand-100/60", "i"],
+  }[tone];
+
+  return (
+    <div className={`flex items-start gap-2.5 rounded-xl border px-3 py-2.5 ${styles[0]}`}>
+      <span className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full text-[11px] font-bold ${styles[1]}`}>{styles[4]}</span>
+      <div className="min-w-0 space-y-0.5">
+        <p className={`text-[11px] font-semibold leading-4 ${styles[2]}`}>{title}</p>
+        <div className={`text-[11px] leading-relaxed ${styles[3]}`}>{children}</div>
+      </div>
     </div>
   );
 }
