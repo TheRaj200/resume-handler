@@ -89,6 +89,7 @@ export const STORAGE_KEYS = {
   onboardingComplete: "jobpilot.onboarding.complete",
   lastSyncAt: "jobpilot.sync.lastAt",
   openTab: "jobpilot.openTab",
+  autofillSession: "jobpilot.autofill.session",
 } as const;
 
 export const SIDE_PANEL_PATHS = {

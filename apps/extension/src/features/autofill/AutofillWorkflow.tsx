@@ -66,6 +66,21 @@ interface PlanRow {
   reason?: string;
 }
 
+interface StoredAutofillSession {
+  version: 1;
+  url: string;
+  domain: string;
+  activeTabId: number;
+  scanResult: FormScanResult;
+  rows: PlanRow[];
+  blocked: Array<{ field: DetectedField; reason: string }>;
+  facts: ProfileFact[];
+  pageContext: PageContext | null;
+  duplicateApp: Application | null;
+  trackedAppId: string | null;
+  isMarkedApplied: boolean;
+}
+
 function formatValue(value: FieldValue): string {
   if (value === null || value === undefined) return "—";
   if (Array.isArray(value)) return value.join(", ");
@@ -114,6 +129,7 @@ export function AutofillWorkflow() {
   >([]);
   const [facts, setFacts] = useState<ProfileFact[]>([]);
   const [scanResult, setScanResult] = useState<FormScanResult | null>(null);
+  const [scannedUrl, setScannedUrl] = useState("");
   const [domain, setDomain] = useState("");
   const [activeTabId, setActiveTabId] = useState<number | null>(null);
   const [scanning, setScanning] = useState(false);
@@ -137,6 +153,66 @@ export function AutofillWorkflow() {
     highlightMatches: true,
     aiMatching: false,
   });
+  const [sessionHydrated, setSessionHydrated] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    void chrome.storage.session.get(STORAGE_KEYS.autofillSession).then((stored) => {
+      if (cancelled) return;
+      const session = stored[STORAGE_KEYS.autofillSession] as StoredAutofillSession | undefined;
+      if (session?.version === 1 && session.scanResult && Array.isArray(session.rows)) {
+        setRows(session.rows);
+        setBlocked(session.blocked ?? []);
+        setFacts(session.facts ?? []);
+        setScanResult(session.scanResult);
+        setScannedUrl(session.url ?? "");
+        setDomain(session.domain ?? "");
+        setActiveTabId(session.activeTabId ?? null);
+        setPageContext(session.pageContext ?? null);
+        setDuplicateApp(session.duplicateApp ?? null);
+        setTrackedAppId(session.trackedAppId ?? null);
+        setIsMarkedApplied(session.isMarkedApplied ?? false);
+      }
+      setSessionHydrated(true);
+    }).catch(() => {
+      if (!cancelled) setSessionHydrated(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!sessionHydrated || !scanResult || activeTabId === null) return;
+    const session: StoredAutofillSession = {
+      version: 1,
+      url: scannedUrl,
+      domain,
+      activeTabId,
+      scanResult,
+      rows,
+      blocked,
+      facts,
+      pageContext,
+      duplicateApp,
+      trackedAppId,
+      isMarkedApplied,
+    };
+    void chrome.storage.session.set({ [STORAGE_KEYS.autofillSession]: session });
+  }, [
+    sessionHydrated,
+    scanResult,
+    scannedUrl,
+    rows,
+    blocked,
+    facts,
+    domain,
+    activeTabId,
+    pageContext,
+    duplicateApp,
+    trackedAppId,
+    isMarkedApplied,
+  ]);
 
   useEffect(() => {
     void import("../../lib/autofill-preferences").then(({ getAutofillPreferences }) => {
@@ -182,6 +258,7 @@ export function AutofillWorkflow() {
       const result = await scanForm(tab.id);
       if (!result) throw new Error("Could not scan this page.");
       const targetDomain = new URL(tab.url).hostname;
+      setScannedUrl(tab.url);
       await rememberFormAnswers(targetDomain, tab.url, result.fields);
       const rememberedAnswers = await getRememberedFormAnswers(targetDomain);
       const rememberedByKey = new Map(rememberedAnswers.map((answer) => [answer.key, answer]));
@@ -364,6 +441,10 @@ export function AutofillWorkflow() {
     setError(null);
 
     try {
+      const currentTab = await getActiveTab();
+      if (!currentTab?.id || currentTab.id !== activeTabId || (scannedUrl && currentTab.url !== scannedUrl)) {
+        throw new Error("Ye scan kisi aur page ka hai. Original scanned tab par wapas jaakar fill karo, ya current page rescan karo.");
+      }
       let resumeAttachment: ResumeAttachment | undefined;
 
       if (attachResume && defaultResume && selectedRows.some((row) => row.profileKey === "resume.file")) {
