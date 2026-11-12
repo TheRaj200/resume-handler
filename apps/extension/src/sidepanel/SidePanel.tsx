@@ -199,8 +199,8 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
   const sections: Record<string, Section["render"]> = {
     page: () => (
       <Card className="p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
+        <div className="flex items-start gap-3">
+          <div className="min-w-0 flex-1">
             <p className="text-[10px] uppercase tracking-[0.14em] text-slate-400">Current page</p>
             <p className="mt-1 truncate text-sm font-semibold text-slate-100">
               {context?.jobTitle ?? context?.title ?? "No job page detected"}
@@ -210,9 +210,9 @@ function Dashboard({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
             </p>
           </div>
           {context?.hasJobPosting ? (
-            <Badge tone="emerald">JD detected</Badge>
+            <span className="shrink-0 whitespace-nowrap"><Badge tone="emerald">JD detected</Badge></span>
           ) : (
-            <Badge>No JD</Badge>
+            <span className="shrink-0 whitespace-nowrap"><Badge>No JD</Badge></span>
           )}
         </div>
         <Button className="mt-3 w-full" onClick={() => void buildResumeForJob()}>
@@ -387,10 +387,10 @@ export function SidePanel() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col bg-transparent">
-      <div className="mx-3 mt-3 mb-3 flex flex-1 flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] shadow-[0_8px_40px_rgba(0,0,0,0.4)]">
+    <div className="flex min-h-screen flex-col bg-transparent p-3">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] shadow-[0_8px_40px_rgba(0,0,0,0.4)]">
         <header className="shrink-0 border-b border-white/10 bg-gradient-to-b from-white/[0.05] to-transparent">
-          <div className="flex items-center justify-between px-4 pt-3">
+          <div className="flex items-center justify-between px-5 pt-4 pb-1">
             <div className="flex items-center gap-2.5">
               <div className="grid h-8 w-8 place-items-center rounded-[10px] bg-gradient-to-br from-brand-400 to-brand-600 text-xs font-bold text-white shadow-sm shadow-brand-500/30">
                 J
@@ -415,7 +415,7 @@ export function SidePanel() {
             </div>
           </div>
 
-          <nav className="mt-2.5 flex gap-1 overflow-x-auto px-2 pb-2">
+          <nav className="mt-2.5 flex gap-1 overflow-x-auto px-3 pb-3">
             {TABS.map((tab) => {
               const isActive = active === tab.id;
               return (
