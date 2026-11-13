@@ -34,6 +34,7 @@ import {
 import {
   applyAiSuggestions,
   buildAiPrompt,
+  buildCustomAiPrompt,
   buildLocalResume,
   validateFactLock,
   validateResumeShape,
@@ -213,6 +214,11 @@ export function ResumeStudio() {
   const [aiStatus, setAiStatus] = useState("AI locked");
   const [newSkill, setNewSkill] = useState("");
   const [autoGenerate, setAutoGenerate] = useState(false);
+  const [customPrompt, setCustomPrompt] = useState("");
+  const [extraInfo, setExtraInfo] = useState("");
+  const [customBusy, setCustomBusy] = useState(false);
+  const [useJd, setUseJd] = useState(true);
+  const [useCustomPrompt, setUseCustomPrompt] = useState(true);
 
   useEffect(() => {
     void (async () => {
@@ -313,6 +319,15 @@ export function ResumeStudio() {
     try {
       if (!targetRole.trim()) throw new Error("Target role daalo, phir draft generate karo.");
 
+      const jd = useJd ? jdText.trim() : "";
+      const promptText = useCustomPrompt ? customPrompt.trim() : "";
+      if (!jd && !promptText) {
+        throw new Error("Kam se kam ek source tick karo: Job description ya Custom prompt.");
+      }
+      const brief = [jd, promptText, promptText ? extraInfo.trim() : ""]
+        .filter(Boolean)
+        .join("\n\n");
+
       let generationSource = profileSource;
 
       if (tailorFrom === "resume") {
@@ -362,7 +377,9 @@ export function ResumeStudio() {
       }
 
       const nextAnalysis =
-        analysis ?? (await analyzeJd(jdText, generationSource.skills.map((skill) => skill.name)));
+        useJd && analysis && !promptText
+          ? analysis
+          : await analyzeJd(brief, generationSource.skills.map((skill) => skill.name));
       const jdHash = nextAnalysis.hash;
       const local = buildLocalResume({
         source: generationSource,
@@ -389,7 +406,9 @@ export function ResumeStudio() {
         }
 
         try {
-          const prompt = buildAiPrompt(local, generationSource, jdText);
+          const prompt = promptText
+            ? buildCustomAiPrompt(local, generationSource, promptText, extraInfo, jd)
+            : buildAiPrompt(local, generationSource, jd);
           const suggestions = await callAiJson<AiResumeSuggestions>({
             settings,
             apiKey,
@@ -421,7 +440,7 @@ export function ResumeStudio() {
 
       const saved = await saveResumeVersion(next, {
         resumeId: seriesId ?? undefined,
-        jdSnapshot: jdText,
+        jdSnapshot: brief,
         sourceSnapshot: generationSource,
       });
       setSeriesId(saved.resumeId);
@@ -440,6 +459,82 @@ export function ResumeStudio() {
     setAutoGenerate(false);
     void handleGenerate();
   }, [autoGenerate, jdText, targetRole, profile, busy]);
+
+  async function handleGenerateCustom() {
+    if (!useCustomPrompt) {
+      setError("Pehle 'Use this prompt' tick karo, phir custom resume generate karo.");
+      return;
+    }
+    if (!customPrompt.trim()) {
+      setError("Apna prompt likho — kya custom resume chahiye.");
+      return;
+    }
+    setCustomBusy(true);
+    setError(null);
+    setNotice(null);
+
+    try {
+      const apiKey = getUnlockedApiKey();
+      if (!apiKey) {
+        throw new Error("Custom resume ke liye AI key unlock karo (Settings → API Key Vault).");
+      }
+      const settings = await loadSettings();
+      if (!(await hasProviderPermission(settings))) {
+        throw new Error("AI endpoint permission missing. Settings me grant karo.");
+      }
+
+      const roleForResume = targetRole.trim() || customPrompt.trim().slice(0, 60);
+      const jd = useJd ? jdText.trim() : "";
+      const brief = [jd, customPrompt.trim(), extraInfo.trim()].filter(Boolean).join("\n\n");
+      const nextAnalysis = await analyzeJd(brief, profileSource.skills.map((skill) => skill.name));
+      const local = buildLocalResume({
+        source: profileSource,
+        targetRole: roleForResume,
+        targetCompany,
+        templateId,
+        analysis: nextAnalysis,
+        provider: "local",
+        model: "deterministic",
+        jdHash: nextAnalysis.hash,
+      });
+
+      const prompt = buildCustomAiPrompt(local, profileSource, customPrompt, extraInfo, jd);
+      const suggestions = await callAiJson<AiResumeSuggestions>({
+        settings,
+        apiKey,
+        system: prompt.system,
+        user: prompt.user,
+      });
+      const next = applyAiSuggestions(local, suggestions, profileSource);
+      next.meta.provider = settings.provider;
+      next.meta.model = settings.model;
+
+      const validation = validateFactLock(next, profileSource);
+      next.meta.factLockPassed = validation.ok;
+      if (!validation.ok) {
+        throw new Error(`Fact-lock failed: ${validation.errors.join(" ")}`);
+      }
+
+      const shape = validateResumeShape(next);
+      if (!shape.ok) {
+        throw new Error(`Resume schema validation failed: ${shape.errors.join(" ")}`);
+      }
+
+      const saved = await saveResumeVersion(next, {
+        resumeId: seriesId ?? undefined,
+        jdSnapshot: brief,
+        sourceSnapshot: profileSource,
+      });
+      setSeriesId(saved.resumeId);
+      setResume(next);
+      setAnalysis(nextAnalysis);
+      setNotice(`Custom resume v${saved.versionNumber} saved.`);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Custom resume generation failed");
+    } finally {
+      setCustomBusy(false);
+    }
+  }
 
   async function handleSaveVersion() {
     if (!resume) return;
@@ -658,10 +753,21 @@ export function ResumeStudio() {
       ) : null}
 
       <Card className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
-            Job description
-          </h3>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
+              Job description
+            </h3>
+            <label className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-2 py-1 text-[10px] text-slate-300">
+              <input
+                type="checkbox"
+                checked={useJd}
+                onChange={(event) => setUseJd(event.target.checked)}
+                className="h-3 w-3 accent-brand-500"
+              />
+              Use this JD
+            </label>
+          </div>
           <Button variant="secondary" onClick={() => void handleUsePageJd()}>
             Use page JD
           </Button>
@@ -706,6 +812,60 @@ export function ResumeStudio() {
             </p>
           </div>
         ) : null}
+      </Card>
+
+      <Card className="space-y-3">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
+              Custom prompt resume
+            </h3>
+            <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
+              JD ki zaroorat nahi. Apna prompt likho — AI aapke saved profile data se custom resume banayega. Naye facts invent nahi honge.
+            </p>
+          </div>
+          <label className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-2 py-1 text-[10px] text-slate-300">
+            <input
+              type="checkbox"
+              checked={useCustomPrompt}
+              onChange={(event) => setUseCustomPrompt(event.target.checked)}
+              className="h-3 w-3 accent-brand-500"
+            />
+            Use this prompt
+          </label>
+        </div>
+
+        <Field label="What should the resume do?">
+          <textarea
+            className={`${inputClass} min-h-24 resize-y`}
+            value={customPrompt}
+            onChange={(event) => setCustomPrompt(event.target.value)}
+            placeholder="e.g. Fresher-friendly React developer resume, highlight projects first, keep it one page, simple ATS wording."
+          />
+        </Field>
+
+        <Field label="Extra info for this resume (optional)" hint="Skills, certifications, achievements — jo profile me nahi hain.">
+          <textarea
+            className={`${inputClass} min-h-20 resize-y`}
+            value={extraInfo}
+            onChange={(event) => setExtraInfo(event.target.value)}
+            placeholder="e.g. AWS Cloud Practitioner (2025), 2 freelance React projects, open to remote."
+          />
+        </Field>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Button onClick={() => void handleGenerateCustom()} disabled={customBusy || !aiReady || !useCustomPrompt}>
+            {customBusy ? "Building custom resume..." : "Generate custom resume"}
+          </Button>
+          {!useCustomPrompt ? (
+            <span className="text-[11px] text-slate-500">Tick "Use this prompt" to include it.</span>
+          ) : !aiReady ? (
+            <span className="text-[11px] text-amber-200/80">AI unlock karke provider permission do.</span>
+          ) : null}
+          <span className="text-[10px] text-slate-500">
+            {useJd && jdText.trim() ? "JD + prompt dono use honge." : "Sirf custom prompt use hoga."}
+          </span>
+        </div>
       </Card>
 
       <Card className="space-y-3">
@@ -819,7 +979,7 @@ export function ResumeStudio() {
           </Field>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button onClick={() => void handleGenerate()} disabled={busy}>
             {busy ? "Generating..." : resume ? "Regenerate draft" : "Generate draft"}
           </Button>
@@ -834,12 +994,18 @@ export function ResumeStudio() {
             </>
           ) : null}
         </div>
+        <p className="text-[10px] text-slate-500">
+          Using:{" "}
+          {[useJd && jdText.trim() ? "Job description" : "", useCustomPrompt && customPrompt.trim() ? "Custom prompt" : ""]
+            .filter(Boolean)
+            .join(" + ") || "nothing — tick at least one source"}
+        </p>
       </Card>
 
       {!resume ? (
         <EmptyState
           title="No draft yet"
-          description="JD analyze karke draft generate karo. Full mode profile facts use karta hai; Quick mode uploaded resume se facts leta hai. Koi naya skill/company invent nahi hota."
+          description="Tick JD and/or custom prompt, phir draft generate karo. Full mode profile facts use karta hai; Quick mode uploaded resume se facts leta hai. Koi naya skill/company invent nahi hota."
         />
       ) : (
         <>

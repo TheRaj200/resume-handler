@@ -6,10 +6,12 @@ import { ResumeLibrary } from "../features/resumes/ResumeLibrary";
 import { ResumeStudio } from "../features/resume-studio/ResumeStudio";
 import { ApplicationsManager } from "../features/applications/ApplicationsManager";
 import { SettingsPanel } from "../features/settings/SettingsPanel";
+import { AutomationPanel } from "../features/automation/AutomationPanel";
 import { getSyncSettings, syncNow } from "../lib/sync-client";
 
 const TABS = [
   { id: "dashboard", label: "Dashboard", icon: "M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" },
+  { id: "automation", label: "Automation", icon: "M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1" },
   { id: "profile", label: "My Info", icon: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9c0-3.3 3.1-5.5 7-5.5s7 2.2 7 5.5" },
   { id: "resumes", label: "Resumes", icon: "M7 3h7l5 5v13H7V3Zm7 0v5h5M10 12h6M10 16h6" },
   { id: "studio", label: "Studio", icon: "M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1" },
@@ -105,6 +107,7 @@ export function FloatApp() {
       {/* Content with premium transitions */}
       <main className="float-content min-h-0 flex-1 overflow-y-auto px-5 py-5" key={active}>
           {active === "dashboard" ? <FloatDashboard onNavigate={(tab) => setActive(tab)} /> : null}
+          {active === "automation" ? <AutomationPanel /> : null}
           {active === "profile" ? <ProfileEditor /> : null}
           {active === "resumes" ? <ResumeLibrary /> : null}
           {active === "studio" ? <ResumeStudio /> : null}
